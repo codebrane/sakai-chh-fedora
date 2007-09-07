@@ -1,0 +1,116 @@
+<project name="CTREP::FEDORA::WS::TESTS" default="usage">
+  <!-- Initialise TODAY, DSTAMP and TSTAMP -->
+  <tstamp>
+    <format property="TODAY" pattern="d MMMM yyyy" locale="en"/>
+    <format property="TSTAMP" pattern="hh:mm:ss" locale="en"/>
+  </tstamp>
+
+  <property file="build.properties" />
+
+  <!-- Source files -->
+  <property name="src.dir" value="testsrc" />
+
+  <!-- JAR file to build -->
+  <property name="jar.file" value="fedora-client-tests.jar" />
+
+  <!-- Distribution directories -->
+  <property name="dist.dir" value="dist" />
+  <property name="classes.dir" value="classes" />
+
+  <!-- CLASSPATH for compiling the tests -->
+  <path id="classpath">
+    <fileset dir="${axis2.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${junit4.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${fedora.api.a.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${fedora.api.m.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <!-- CLASSPATH for running the tests -->
+  <path id="test.jar.classpath">
+    <fileset dir="${dist.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <!-- Prepare the directories for building and distribution -->
+  <target name="clean" description="Prepares directory structure for the build">
+    <delete dir="${dist.dir}"/>
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <!-- Creates the directories required for building and distribution -->
+  <target name="initDistDirs">
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+  </target>
+
+  <!-- Compile -->
+  <target name="compile" description="Compiles the classes">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"
+           source="${javac.source}" target="${javac.target}">
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <!-- Copies non class files to the classes directory if they need to be on the CLASSPATH -->
+  <target name="copyClasspathFiles">
+    <copy todir="${classes.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.properties" />
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- JAR -->
+  <target name="jar" depends="compile" description="Builds a JAR file">
+    <jar jarfile="${dist.dir}/${jar.file}" basedir="${classes.dir}">
+      <manifest>
+        <attribute name="Implementation-Vendor" value="${implementation-vendor}"/>
+        <attribute name="Implementation-Title" value="${module.name}"/>
+        <attribute name="Implementation-Version" value="${version}"/>
+        <attribute name="Implementation-Date" value="${TODAY} ${TSTAMP}"/>
+        <attribute name="Built-By" value="${user.name}"/>
+      </manifest>
+    </jar>
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <target name="run-tests" description="Runs the web services tests" depends="dist">
+    <junit fork="yes"
+           haltonfailure="yes"
+           haltonerror="yes"
+           printsummary="yes"
+           showoutput="yes">
+      <test name="${repository.test.suite.class}" />
+      <formatter type="plain" usefile="false" />
+      <classpath refid="classpath" />
+      <classpath refid="test.jar.classpath" />
+    </junit>
+  </target>
+
+  <!-- Default target - builds everything -->
+  <target name="dist"
+          depends="clean,initDistDirs,compile,copyClasspathFiles,jar"
+          description="Builds everything into the distribution directory"/>
+
+  <target name="usage">
+  	<echo>
+  		Fedora ${fedora.version} web services client tests.
+  		The web services clients supported are:
+
+  		API-A : The Fedora Access service for accessing digital objects.
+  		API-M : The Fedora Management service for administering the repository.
+
+  		dist			: Compiles the tests JAR in ${dist.dir}
+  		run-tests	: Runs the web services tests. You need to install and start Fedora first.
+  	</echo>
+  </target>
+</project>
