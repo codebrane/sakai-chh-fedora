@@ -1,6 +1,6 @@
-/* CVS Header
+/* SVN Header
    $Id$
-   $Log$
+   $URL$
 */
 
 package fedora.webservices.client.api;
@@ -30,7 +30,7 @@ public abstract class RepositoryTest {
   public static void init() {
     repositoryProperties = ResourceBundle.getBundle("fedora.webservices.client.api.repository");
 
-    // Set up the trusstore. We need this to verify the Fedora server's certificate as we are connecting via HTTPS
+    // Set up the truststore. We need this to verify the Fedora server's certificate as we are connecting via HTTPS
     System.setProperty("javax.net.ssl.trustStore", repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION));
     System.setProperty("javax.net.ssl.trustStorePassword", repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD));
 

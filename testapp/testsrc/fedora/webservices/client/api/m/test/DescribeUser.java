@@ -1,6 +1,6 @@
-/* CVS Header
+/* SVN Header
    $Id$
-   $Log$
+   $URL$
 */
 
 package fedora.webservices.client.api.m.test;
