@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.sakaiproject.exception.ServerOverloadException;
+import org.sakaiproject.content.api.*;
 
 /**
  * @author ieb
@@ -19,8 +20,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * 
 	 * @param edit
 	 */
-	void cancel(ContentCollectionEdit edit) {
-		throw new MethodNotImplementedException();
+	public void cancel(ContentCollectionEdit edit) {
 	}
 
 	/**
@@ -28,8 +28,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * 
 	 * @param edit
 	 */
-	void cancel(ContentResourceEdit edit) {
-		throw new MethodNotImplementedException();
+	public void cancel(ContentResourceEdit edit) {
 	}
 
 	/**
@@ -37,8 +36,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * 
 	 * @param edit
 	 */
-	void commit(ContentCollectionEdit edit) {
-		throw new MethodNotImplementedException();
+	public void commit(ContentCollectionEdit edit) {
 	}
 
 	/**
@@ -46,8 +44,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * 
 	 * @param edit
 	 */
-	void commit(ContentResourceEdit edit) {
-		throw new MethodNotImplementedException();
+	public void commit(ContentResourceEdit edit) {
 	}
 
 	/**
@@ -56,8 +53,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 * @param uuid
 	 */
-	void commitDeleted(ContentResourceEdit edit, String uuid) {
-		throw new MethodNotImplementedException();
+	public void commitDeleted(ContentResourceEdit edit, String uuid) {
 	}
 
 	/**
@@ -66,8 +62,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param collection
 	 * @return
 	 */
-	List getCollections(ContentCollection collection) {
-		throw new MethodNotImplementedException();
+	public List getCollections(ContentCollection collection) {
+		return null;
 	}
 
 	/**
@@ -76,8 +72,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param id
 	 * @return
 	 */
-	ContentCollectionEdit getContentCollectionEdit(String id) {
-		throw new MethodNotImplementedException();
+	public ContentCollectionEdit getContentCollectionEdit(String id) {
+		return null;
 	}
 
 	/**
@@ -86,8 +82,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param id
 	 * @return
 	 */
-	ContentResourceEdit getContentResourceEdit(String id) {
-		throw new MethodNotImplementedException();
+	public ContentResourceEdit getContentResourceEdit(String id) {
+		return null;
 	}
 
 	/**
@@ -96,8 +92,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param ce
 	 * @return
 	 */
-	List getFlatResources(ContentEntity ce) {
-		throw new MethodNotImplementedException();
+	public List getFlatResources(ContentEntity ce) {
+		return null;
 	}
 
 	/**
@@ -107,8 +103,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 * @throws ServerOverloadException
 	 */
-	byte[] getResourceBody(ContentResource resource) throws ServerOverloadException {
-		throw new MethodNotImplementedException();
+	public byte[] getResourceBody(ContentResource resource) throws ServerOverloadException {
+		return null;
 	}
 
 	/**
@@ -117,8 +113,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param collection
 	 * @return
 	 */
-	List getResources(ContentCollection collection) {
-		throw new MethodNotImplementedException();
+	public List getResources(ContentCollection collection) {
+		return null;
 	}
 
 	/**
@@ -128,8 +124,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 * @return
 	 */
-	ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
-		throw new MethodNotImplementedException();
+	public ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
+		return null;
 	}
 
 	/**
@@ -140,8 +136,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param userId
 	 * @return
 	 */
-	ContentResourceEdit putDeleteResource(String id, String uuid, String userId) {
-		throw new MethodNotImplementedException();
+	public ContentResourceEdit putDeleteResource(String id, String uuid, String userId) {
+		return null;
 	}
 
 	/**
@@ -149,8 +145,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * 
 	 * @param edit
 	 */
-	void removeCollection(ContentCollectionEdit edit) {
-		throw new MethodNotImplementedException();
+	public void removeCollection(ContentCollectionEdit edit) {
 	}
 
 	/**
@@ -158,8 +153,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * 
 	 * @param edit
 	 */
-	void removeResource(ContentResourceEdit edit) {
-		throw new MethodNotImplementedException();
+	public void removeResource(ContentResourceEdit edit) {
 	}
 
 	/**
@@ -169,8 +163,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 * @throws ServerOverloadException
 	 */
-	InputStream streamResourceBody(ContentResource resource) throws ServerOverloadException {
-		throw new MethodNotImplementedException();
+	public InputStream streamResourceBody(ContentResource resource) throws ServerOverloadException {
+		return null;
 	}
 
 	/**
@@ -178,24 +172,24 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param ce
 	 * @return
 	 */
-	int getMemberCount(ContentEntity ce) {
-		throw new MethodNotImplementedException();
+	public int getMemberCount(ContentEntity ce) {
+		return -1;
 	}
 
 	/**
 	 * @param ce
 	 * @return
 	 */
-	Collection<String> getMemberCollectionIds(ContentEntity ce) {
-		throw new MethodNotImplementedException();
+	public Collection<String> getMemberCollectionIds(ContentEntity ce) {
+		return null;
 	}
 
 	/**
 	 * @param ce
 	 * @return
 	 */
-	Collection<String> getMemberResourceIds(ContentEntity ce) {
-		throw new MethodNotImplementedException();
+	public Collection<String> getMemberResourceIds(ContentEntity ce) {
+		return null;
 	}
 
 	/**
@@ -203,8 +197,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param new_id
 	 * @return
 	 */
-	String moveResource(ContentResourceEdit thisResource, String new_id) {
-		throw new MethodNotImplementedException();
+	public String moveResource(ContentResourceEdit thisResource, String new_id) {
+		return null;
 	}
 
 	/**
@@ -212,8 +206,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param new_folder_id
 	 * @return
 	 */
-	String moveCollection(ContentCollectionEdit thisCollection, String new_folder_id) {
-		throw new MethodNotImplementedException();
+	public String moveCollection(ContentCollectionEdit thisCollection, String new_folder_id) {
+		return null;
 	}
 
 	/**
@@ -221,15 +215,13 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param uuid
 	 * @return
 	 */
-	 void setResourceUuid(String resourceId, String uuid) {
-	 	throw new MethodNotImplementedException();
+	 public void setResourceUuid(String resourceId, String uuid) {
 	 }
 
 	/**
 	 * @param id
 	 */
-	void getUuid(String id) {
-		throw new MethodNotImplementedException();
+	public void getUuid(String id) {
 	}
 
 }

@@ -21,7 +21,9 @@
 
 package org.sakaiproject.content.chh.fedora;
 
-import org.sakaiproject.content.api.GroupAwareEntity;
+import org.sakaiproject.content.api.ContentEntity;
+import org.sakaiproject.content.api.ContentCollection;
+import org.sakaiproject.content.api.ContentHostingHandler;
 
 public class ContentEntityFedora implements ContentEntity {
 	/**
@@ -29,7 +31,7 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public ContentCollection getContainingCollection() {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 	/**
@@ -37,7 +39,7 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return true if the entity implements the ContentResource interface, false otherwise.
 	 */
 	public boolean isResource() {
-		throw new MethodNotImplementedException();
+		return false;
 	}
 	
 	/**
@@ -45,7 +47,7 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return true if the entity implements the ContentCollection interface, false otherwise.
 	 */
 	public boolean isCollection() {
-		throw new MethodNotImplementedException();
+		return false;
 	}
 	
 	/**
@@ -54,15 +56,15 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public String getResourceType() {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public ContentHostingHandler getContentHandler() {
-		throw new MethodNotImplementedException();
+	public ContentHostingHandlerImplFedora getContentHandler() {
+		return new ContentHostingHandlerImplFedora();
 	}
 	
 	/**
@@ -70,7 +72,6 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @param chh
 	 */
 	public void setContentHandler(ContentHostingHandler chh) {
-		throw new MethodNotImplementedException();
 	}
 	
 	/**
@@ -78,7 +79,7 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity() {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 	/**
@@ -86,7 +87,6 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @param ce
 	 */
 	public void setVirtualContentEntity(ContentEntity ce) {
-		throw new MethodNotImplementedException();
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public ContentEntity getMember(String nextId) {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class ContentEntityFedora implements ContentEntity {
 	 * @return The URL which can be used to access the resource.
 	 */
 	public String getUrl(boolean relative) {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 }

@@ -23,10 +23,8 @@ package org.sakaiproject.content.chh.fedora;
 
 import java.io.InputStream;
 
-import org.sakaiproject.content.api.ContentEntity;
-import org.sakaiproject.content.api.GroupAwareEntity;
+import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.exception.ServerOverloadException;
-import org.sakaiproject.time.api.Time;
 
 /**
 * <p>ContentResource is the core interface for a Resource object in the GenericContentHostingService.</p>
@@ -37,7 +35,7 @@ public class ContentResourceFedora implements ContentResource {
 	* @return The content byte length.
 	*/
 	public int getContentLength() {
-		throw new MethodNotImplementedException();
+		return -1;
 	}
 
 	/**
@@ -45,7 +43,7 @@ public class ContentResourceFedora implements ContentResource {
 	* @return The resource MIME type.
 	*/
 	public String getContentType() {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 
 	/**
@@ -56,7 +54,7 @@ public class ContentResourceFedora implements ContentResource {
 	* 			trying to access the filesystem.
 	*/
 	public byte[] getContent() throws ServerOverloadException {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 
 	/**
@@ -66,7 +64,7 @@ public class ContentResourceFedora implements ContentResource {
 	 * @throws ServerOverloadException if the server cannot produce the content stream at this time.
 	 */
 	public InputStream streamContent() throws ServerOverloadException {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 }	// ContentResource

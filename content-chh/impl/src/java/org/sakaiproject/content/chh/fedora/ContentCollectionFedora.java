@@ -23,8 +23,7 @@ package org.sakaiproject.content.chh.fedora;
 
 import java.util.List;
 
-import org.sakaiproject.content.api.ContentEntity;
-import org.sakaiproject.content.api.GroupAwareEntity;
+import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.time.api.Time;
 
 /**
@@ -40,8 +39,8 @@ public class ContentCollectionFedora implements ContentCollection {
 	* @return a List of the collection's internal members, each a resource id String (may be empty).
 	*/
 	public List getMembers() {
-		throw new MethodNotImplementedException();
-	}
+		return null;
+  }
 
 	/**
 	* Access a List of the collections' internal members as full ContentResource or
@@ -49,7 +48,7 @@ public class ContentCollectionFedora implements ContentCollection {
 	* @return a List of the full objects of the members of the collection.
 	*/
 	public List getMemberResources() {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 
 	/**
@@ -57,7 +56,7 @@ public class ContentCollectionFedora implements ContentCollection {
 	* @return The size of all the resource body bytes within this collection in Kbytes.
 	*/
 	public long getBodySizeK() {
-		throw new MethodNotImplementedException();
+		return -1;
 	}
 	
 	/**
@@ -67,7 +66,7 @@ public class ContentCollectionFedora implements ContentCollection {
 	 * @return
 	 */
 	public int getMemberCount() {
-		throw new MethodNotImplementedException();
+		return -1;
 	}
 	
 	/**
@@ -85,7 +84,7 @@ public class ContentCollectionFedora implements ContentCollection {
 	 * @return The date/time at which access to the entity should be restricted.
 	 */
 	public Time getRetractDate() {
-		throw new MethodNotImplementedException();
+		return null;
 	}
 	
 }	// ContentCollection
