@@ -33,7 +33,7 @@ import org.sakaiproject.time.api.Time;
 * @author University of Michigan, CHEF Software Development Team
 * @version $Revision: 19673 $
 */
-public class ContentCollectionFedora implements ContentCollection {
+public class ContentCollectionFedora extends ContentEntityFedora implements ContentCollection {
 	/**
 	* Access a List of the collection's internal members, each a resource id String.
 	* @return a List of the collection's internal members, each a resource id String (may be empty).
@@ -86,8 +86,8 @@ public class ContentCollectionFedora implements ContentCollection {
 	public Time getRetractDate() {
 		return null;
 	}
-	
-}	// ContentCollection
+
+}
 
 
 

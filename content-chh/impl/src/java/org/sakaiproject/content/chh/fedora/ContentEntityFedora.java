@@ -24,8 +24,15 @@ package org.sakaiproject.content.chh.fedora;
 import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentHostingHandler;
+import org.sakaiproject.time.api.Time;
+import org.sakaiproject.entity.api.ResourceProperties;
+import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 
-public class ContentEntityFedora implements ContentEntity {
+import java.util.Collection;
+import java.util.Stack;
+
+public abstract class ContentEntityFedora implements ContentEntity {
 	/**
 	 * Access this ContentEntity's containing collection, or null if this entity is the site collection.
 	 * @return
@@ -98,15 +105,78 @@ public class ContentEntityFedora implements ContentEntity {
 		return null;
 	}
 	
-	/**
-	 * Access the URL which can be used to access the entity. Will return a relative or absolute url, 
-	 * depending on value of the parameter. If parameter is true, URL will be relative to the server's
-	 * root.  Otherwise, it will be a complete URL starting with the base URL of the server. 
-	 * @param relative 
-	 * @return The URL which can be used to access the resource.
-	 */
-	public String getUrl(boolean relative) {
-		return null;
-	}
-	
+  /* Junk required by GroupAwareEntity superinterface */
+  public Collection getGroups() {
+    return null;
+  }
+
+  public Collection getGroupObjects() {
+    return null;
+  }
+
+  public AccessMode getAccess() {
+    return null;
+  }
+
+  public Collection getInheritedGroups() {
+    return null;
+  }
+
+  public Collection getInheritedGroupObjects() {
+    return null;
+  }
+
+  public AccessMode getInheritedAccess() {
+    return null;
+  }
+
+  public Time getReleaseDate() {
+    return null;
+  }
+
+  public Time getRetractDate() {
+    return null;
+  }
+
+  public boolean isHidden() {
+    return false;
+  }
+
+  public boolean isAvailable() {
+    return false;
+  }
+
+  public String getUrl() {
+    return null;
+  }
+
+  public String getUrl(boolean b) {
+    return null;
+  }
+
+  public String getReference() {
+    return null;
+  }
+
+  public String getUrl(String rootProperty) {
+    return null;
+  }
+
+  public String getReference(String rootProperty) {
+    return null;
+  }
+
+  public String getId() {
+    return null;
+  }
+
+  public ResourceProperties getProperties() {
+    return null;
+  }
+
+  public Element toXml(Document doc, Stack stack) {
+    return null;
+  }
+
+
 }

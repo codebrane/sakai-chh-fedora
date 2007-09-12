@@ -29,7 +29,7 @@ import org.sakaiproject.exception.ServerOverloadException;
 /**
 * <p>ContentResource is the core interface for a Resource object in the GenericContentHostingService.</p>
 */
-public class ContentResourceFedora implements ContentResource {
+public class ContentResourceFedora extends ContentEntityFedora implements ContentResource {
 	/**
 	* Access the content byte length.
 	* @return The content byte length.
@@ -67,7 +67,7 @@ public class ContentResourceFedora implements ContentResource {
 		return null;
 	}
 	
-}	// ContentResource
+}
 
 
 
