@@ -35,6 +35,7 @@ to see a list of available build targets.
 
 Generating the web services clients
 -----------------------------------
+Open the file repository.properties and modify the settings indicated in the file.
 Open the file build.properties and modify the settings indicated in the file.
 
 In this directory use the following command:
