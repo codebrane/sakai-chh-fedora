@@ -66,4 +66,4 @@ Reporting problems
 ------------------
 If you find any problems, send an email to:
 
-alistair@smo.uhi.ac.uk  
+alistair@smo.uhi.ac.uk   
