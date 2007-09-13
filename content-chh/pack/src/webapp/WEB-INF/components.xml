@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="uk.ac.uhi.it.ContentHostingHandlerImplFedora"
+			  class="org.sakaiproject.content.chh.fedora.ContentHostingHandlerImplFedora"
+			  singleton="true">
+			  
+	<property name="contentHostingHandlerResolver" >
+	  <ref bean="org.sakaiproject.content.api.ContentHostingHandlerResolver"/>
+	</property>
+	
+	</bean>
+	
+</beans>

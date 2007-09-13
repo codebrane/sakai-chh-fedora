@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <artifactId>content-chh-fedora-base</artifactId>
+    <groupId>org.sakaiproject</groupId>
+    <version>M2</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  
+  <name>sakai-content-chh-fedora-pack</name>
+  <groupId>org.sakaiproject</groupId>
+  <artifactId>sakai-content-chh-fedora-pack</artifactId>
+  
+  <organization>
+    <name>UHI Millennium Institute</name>
+    <url>http://www.weblogs.uhi.ac.uk/sm00ay/?cat=22</url>
+  </organization>
+  
+  <inceptionYear>2007</inceptionYear>
+  
+  <packaging>sakai-component</packaging>
+  <properties>
+    <deploy.target>components</deploy.target>
+  </properties>
+  
+  <dependencies>
+
+    <dependency>
+      <groupId>org.sakaiproject</groupId>
+      <artifactId>sakai-content-fedora-chh</artifactId>
+      <version>${sakai.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <resources/>
+  </build>
+</project>
