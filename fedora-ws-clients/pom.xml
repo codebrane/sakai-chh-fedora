@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <name>sakai-content-chh-fedora-ws-clients</name>
+  <groupId>org.sakaiproject</groupId>
+  <artifactId>sakai-content-chh-fedora-ws-clients</artifactId>
+  <version>M2</version>
+  
+  <organization>
+    <name>UHI Millennium Institute</name>
+    <url>http://www.weblogs.uhi.ac.uk/sm00ay/?cat=22</url>
+  </organization>
+  
+  <inceptionYear>2007</inceptionYear>
+  
+  <packaging>jar</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant-junit</artifactId>
+      <version>1.6.5</version>
+      <scope>test</scope>
+    </dependency> 
+  </dependencies>	        
+  
+  <repositories>
+    <repository>
+      <id>source.uhi.ac.uk-repository</id>
+      <name>UHI Maven 2.x Repository</name>
+      <url>http://source.uhi.ac.uk/mvn</url>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <!-- mvn install -->
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>install</phase>
+						<configuration>
+        			<tasks>
+        				<ant antfile="${basedir}/build.xml">
+        					<target name="all"/>
+        				</ant>
+        			</tasks>
+						</configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
