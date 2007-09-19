@@ -29,6 +29,7 @@
       <version>1.6.5</version>
       <scope>test</scope>
     </dependency> 
+    
   </dependencies>	        
   
   <repositories>
@@ -41,11 +42,30 @@
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
+    
+    <repository>
+      <id>axis2-repository</id>
+      <name>Axis2 Maven 2.x Repository</name>
+      <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/jars/</url>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
   </repositories>
 
   <!-- mvn install -->
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -54,7 +74,7 @@
 						<configuration>
         			<tasks>
         				<ant antfile="${basedir}/build.xml">
-        					<target name="all"/>
+        					<target name="clients"/>
         				</ant>
         			</tasks>
 						</configuration>
@@ -64,7 +84,30 @@
           </execution>
         </executions>
       </plugin>
+    
+    	<!-- mvn -Dtest=RepositoryTestSuite test -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <include>RepositoryTestSuite.java</include>
+        </configuration>
+      </plugin>
     </plugins>
+    
+    <sourceDirectory>testapp/testsrc</sourceDirectory>
+    
+    <resources/>
+
+    <testResources>
+      <testResource>
+        <directory>${basedir}/testapp/testsrc</directory>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+        <filtering>false</filtering>
+      </testResource>
+    </testResources>
   </build>
   
 </project>
