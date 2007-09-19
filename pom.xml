@@ -53,5 +53,6 @@
   <modules>
     <module>content-chh/impl</module>
     <module>content-chh/pack</module>
+    <module>content-chh-test</module>
   </modules>
 </project>
