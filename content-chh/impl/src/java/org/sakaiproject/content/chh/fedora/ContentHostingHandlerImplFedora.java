@@ -9,13 +9,38 @@ import java.util.List;
 
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.content.api.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * @author ieb
+ *
+ *
+ * @author Alistair Young alistairskye@googlemail.com
  */
 public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
+  /** Our logger */
+  private static final Log log = LogFactory.getLog(ContentHostingHandlerImplFedora.class);
 
-	/**
+  /** The Sakai content hosting resolver */
+  private ContentHostingHandlerResolver contentHostingHandlerResolver = null;
+
+  /**
+   * Sets the Sakai ContentHostingHandlerResolver to use. Injected by Spring from components.xml
+   * @param chhr ContentHostingHandlerResolver to use
+   */
+  public void setContentHostingHandlerResolver(ContentHostingHandlerResolver chhr) {
+    contentHostingHandlerResolver = chhr;
+  }
+
+  /**
+   * Retrieves the Sakai ContentHostingHandlerResolver we are using
+   * @return ContentHostingHandlerResolver we are using
+   */
+  public ContentHostingHandlerResolver getContentHostingHandlerResolver() {
+    return contentHostingHandlerResolver;
+  }
+
+  /**
 	 * Cancel an edit to a collection, if this needs to be done in the impl.
 	 * 
 	 * @param edit
