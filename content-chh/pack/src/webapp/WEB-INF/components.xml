@@ -7,9 +7,9 @@
 			  class="org.sakaiproject.content.chh.fedora.ContentHostingHandlerImplFedora"
 			  singleton="true">
 			  
-	<property name="contentHostingHandlerResolver" >
-	  <ref bean="org.sakaiproject.content.api.ContentHostingHandlerResolver"/>
-	</property>
+	  <property name="contentHostingHandlerResolver" >
+	    <ref bean="org.sakaiproject.content.api.ContentHostingHandlerResolver"/>
+	  </property>
 	
 	</bean>
 	
