@@ -65,6 +65,12 @@
       <version>2.2.1</version>
     </dependency>
 
+    <dependency>
+      <groupId>fedora</groupId>
+      <artifactId>fedora-foxml</artifactId>
+      <version>1.0</version>
+    </dependency>
+
     <!-- Third party dependencies -->
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
