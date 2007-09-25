@@ -123,6 +123,11 @@
     <antcall target="api-a" />
     <antcall target="api-m" />
   </target>
+
+  <target name="foxml"
+          description="Builds the libraries for working with Fedora FOXML">
+    <ant antfile="build.xml" dir="${foxml.dir}" target="${foxml.target.build}"/>
+  </target>
   
   <target name="run-tests" description="Runs the tests">
     <ant antfile="build.xml" dir="${tests.dir}" target="${tests.target}"/>
@@ -130,7 +135,7 @@
   
   <target name="all"
   				description="Generates and compiles the clients and runs the tests"
-  				depends="clients, run-tests" />
+  				depends="foxml, clients, run-tests" />
   
   <target name="usage">
   	<echo>
@@ -143,8 +148,9 @@
   		Client libraries can be found in the directories:
   		build/SERVICE_TYPE/client/${fedora.version}/dist
   		
-  		all		: Generates and compiles the clients and runs all the tests. You need to install and start Fedora first.
+  		all		: Generates and compiles the clients and FOXML libraries and runs all the tests. You need to install and start Fedora first.
   		clients		: Generates client libraries for all services.
+		foxml		: Generates the Fedora FOXML libraries for describing digital objects.
   		api-a		: Generates client libraries for the API-A service.
   		api-m		: Generates client libraries for the API-M service.
   		run-tests	: Runs the web services tests. You need to install and start Fedora first.
