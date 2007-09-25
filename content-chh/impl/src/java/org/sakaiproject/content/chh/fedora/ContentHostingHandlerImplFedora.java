@@ -9,8 +9,11 @@ import java.util.List;
 
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.content.api.*;
+import org.sakaiproject.content.chh.beans.MountPointDocument;
+import org.sakaiproject.content.chh.beans.MountPoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xmlbeans.XmlException;
 
 /**
  *
@@ -150,7 +153,23 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
-		return null;
+    byte[] content = null;
+    MountPoint fedoraMountPoint = null;
+
+    try {
+      // The content of the resource is XML defining the Fedora connection properties
+      content = ((ContentResource)edit).getContent();
+      MountPointDocument doc = MountPointDocument.Factory.parse(new String(content));
+      fedoraMountPoint = doc.getMountPoint();
+    }
+    catch(ServerOverloadException soe) {
+      log.error("Can't get Fedora mountpoint content", soe);
+    }
+    catch(XmlException xe) {
+      log.error("Can't parse Fedora mountpoint content", xe);
+    }
+
+    return null;
 	}
 
 	/**
