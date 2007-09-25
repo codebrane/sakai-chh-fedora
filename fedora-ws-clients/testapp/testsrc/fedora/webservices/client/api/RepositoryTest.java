@@ -23,6 +23,8 @@ public abstract class RepositoryTest {
   protected static final String PROPS_KEY_FEDORA_ADMIN_PASSWORD = "fedora.admin.password";
   protected static final String PROPS_KEY_FEDORA_VERSION = "fedora.version";
 
+  protected static final String DIGITAL_OBJECT_FORMAT_FOXML = "foxml";
+  protected static final String TEST_DIGITAL_OBJECT_LOG_MESSAGE = "Test via API-* interfaces";
   protected static final String TEST_DIGITAL_OBJECT_PID = "TEST_DIGITAL_OBJECT_PID";
   
   protected static ResourceBundle repositoryProperties = null;
