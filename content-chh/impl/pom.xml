@@ -71,6 +71,12 @@
       <version>1.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>dublincore</groupId>
+      <artifactId>dublincore</artifactId>
+      <version>2002-12-12</version>
+    </dependency>
+
     <!-- Third party dependencies -->
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
