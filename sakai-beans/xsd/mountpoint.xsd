@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<schema targetNamespace="org:sakaiproject:content:chh"
+	xmlns:chh="org:sakaiproject:content:chh"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	blockDefault="substitution"
+	version="2.0">
+	
+	<complexType name="mountPointType">
+		<attribute name="endpoint" type="string"/>
+		<attribute name="baseHandle" type="string"/>
+		<attribute name="searchable" type="string"/>
+	</complexType>
+	
+	<element name="MountPoint" type="chh:mountPointType" />
+	
+</schema>
