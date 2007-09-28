@@ -39,7 +39,7 @@
   <target name="_api" description="Generates the beans API in ${javadoc.dir}">
     <delete dir="${javadoc.dir}"/>
 
-    <javadoc packagenames="org.sakaiproject.content.chh.beans.*"
+    <javadoc packagenames="${api.package}.*"
              sourcepath="${src.gen.dir}"
              defaultexcludes="yes"
              destdir="${javadoc.dir}"
@@ -51,7 +51,7 @@
       <doctitle><![CDATA[<h1>Sakai Beans API</h1>]]></doctitle>
       <bottom><![CDATA[<i>Sakai CHH</i>]]></bottom>
       <tag name="todo" scope="all" description="To do:"/>
-      <group title="Sakai Beans Packages" packages="org.sakaiproject.content.chh.beans*"/>
+      <group title="Sakai Beans Packages" packages="${api.package}*"/>
       <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
     </javadoc>
 
