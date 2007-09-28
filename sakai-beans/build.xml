@@ -13,18 +13,48 @@
 
   <target name="help" description="Displays usage of this build file">
     <echo>
-      ant beans : Builds the Sakai ContentHostingHandlers schema beans
+      ant beans :
+      Builds the Sakai ContentHostingHandlers schema beans. The libraries will be placed in ${lib.dir}/${beans.jar} and the javadocs in ${javadoc.dir}
     </echo>
   </target>
 
   <target name="beans">
     <mkdir dir="${lib.dir}"/>
+    <mkdir dir="${src.gen.dir}"/>
+    <mkdir dir="${javadoc.dir}"/>
+    <antcall target="_generateBeans"/>
+    <antcall target="_api"/>
+  </target>
 
+  <target name="_generateBeans" description="Generates the beans">
     <xmlbean schema="${xsd.home}"
              download="true"
              noupa="true"
-             destfile="${lib.dir}/${beans.jar}">
+             destfile="${lib.dir}/${beans.jar}"
+             srcgendir="${src.gen.dir}">
       <classpath refid="classpath"/>
     </xmlbean>
+  </target>
+
+  <target name="_api" description="Generates the beans API in ${javadoc.dir}">
+    <delete dir="${javadoc.dir}"/>
+
+    <javadoc packagenames="org.sakaiproject.content.chh.beans.*"
+             sourcepath="beansrc"
+             defaultexcludes="yes"
+             destdir="${javadoc.dir}"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="Sakai Beans API">
+      <classpath refid="classpath"/>
+      <doctitle><![CDATA[<h1>Sakai Beans API</h1>]]></doctitle>
+      <bottom><![CDATA[<i>Sakai CHH</i>]]></bottom>
+      <tag name="todo" scope="all" description="To do:"/>
+      <group title="Sakai Beans Packages" packages="org.sakaiproject.content.chh.beans*"/>
+      <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+    </javadoc>
+
+    <delete dir="${src.gen.dir}"/>
   </target>
 </project>
