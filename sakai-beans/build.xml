@@ -40,7 +40,7 @@
     <delete dir="${javadoc.dir}"/>
 
     <javadoc packagenames="org.sakaiproject.content.chh.beans.*"
-             sourcepath="beansrc"
+             sourcepath="${src.gen.dir}"
              defaultexcludes="yes"
              destdir="${javadoc.dir}"
              author="true"
