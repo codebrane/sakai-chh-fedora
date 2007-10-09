@@ -13,11 +13,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.xmlbeans.XmlCursor;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import info.fedora.definitions.x1.x0.types.IngestDocument;
 import info.fedora.definitions.x1.x0.types.IngestResponseDocument;
 
+import javax.xml.namespace.QName;
 import java.rmi.RemoteException;
 
 /**
@@ -121,7 +123,7 @@ public class Ingest extends RepositoryTest {
     dc.appendChild(dcPublisher);
 
     Element dcIdentifier = xmlContent.getDomNode().getOwnerDocument().createElementNS("dc", "identifier");
-    textNode = xmlContent.getDomNode().getOwnerDocument().createTextNode(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_IDENTIFIER));
+    textNode = xmlContent.getDomNode().getOwnerDocument().createTextNode(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_PID));
     dcIdentifier.appendChild(textNode);
     dc.appendChild(dcIdentifier);
 
@@ -145,14 +147,12 @@ public class Ingest extends RepositoryTest {
 
     ingest.setObjectXML(objectDoc.toString().getBytes());
 
-    /*
     XmlCursor cursor = objectDoc.newCursor();
     if (cursor.toFirstChild())
       cursor.setAttributeText(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"),
                                         "info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-0.xsd");
-                                        */
 
-    if (repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE).equalsIgnoreCase("yes"))
+    if (repositoryProperties.getString(PROPS_KEY_DUMP_INGEST_XML).equalsIgnoreCase("yes"))
       Utils.dumpXML(objectDoc, repositoryProperties.getString(PROPS_KEY_DUMP_INGEST_XML_FILE));
 
     try {
