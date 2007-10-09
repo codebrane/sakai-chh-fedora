@@ -15,6 +15,10 @@ import java.util.ResourceBundle;
  * common functionality
  */
 public abstract class RepositoryTest {
+  /** The format and version of ingest messages */
+  protected static final String DIGITAL_OBJECT_FORMAT_FOXML = "foxml1.0";
+  
+  /** Definitions for keys in repository.properties */
   protected static final String PROPS_KEY_TRUSTSTORE_LOCATION = "truststore.location";
   protected static final String PROPS_KEY_TRUSTSTORE_PASSWORD = "truststore.password";
   protected static final String PROPS_KEY_API_A_ENDPOINT = "fedora.api.a.ws.endpoint";
@@ -22,11 +26,23 @@ public abstract class RepositoryTest {
   protected static final String PROPS_KEY_FEDORA_ADMIN_USERNAME = "fedora.admin.username";
   protected static final String PROPS_KEY_FEDORA_ADMIN_PASSWORD = "fedora.admin.password";
   protected static final String PROPS_KEY_FEDORA_VERSION = "fedora.version";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE = "test.file";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_PID = "test.file.pid";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_MIME_TYPE = "test.file.mime.type";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_LABEL = "test.file.label";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_CONTENT_MODEL = "test.file.content.model";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_DATASTREAM_ID = "test.file.datastream.id";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_DATASTREAM_VERSION_ID = "test.file.datastream.version.id";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_TITLE = "test.file.title";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_CREATOR = "test.file.creator";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_SUBJECT = "test.file.subject";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_DESCRIPTION = "test.file.description";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_PUBLISHER = "test.file.publisher";
+  protected static final String PROPS_KEY_TEST_INGEST_FILE_IDENTIFIER = "test.file.identifier";
+  protected static final String PROPS_KEY_DUMP_INGEST_XML = "ingest.dump";
+  protected static final String PROPS_KEY_DUMP_INGEST_XML_FILE = "ingest.dump.file";
+  protected static final String PROPS_KEY_DUMP_INGEST_LOG_MESSAGE = "ingest.log.message";
 
-  protected static final String DIGITAL_OBJECT_FORMAT_FOXML = "foxml";
-  protected static final String TEST_DIGITAL_OBJECT_LOG_MESSAGE = "Test via API-* interfaces";
-  protected static final String TEST_DIGITAL_OBJECT_PID = "TEST_DIGITAL_OBJECT_PID";
-  
   protected static ResourceBundle repositoryProperties = null;
   protected static HttpTransportProperties.Authenticator authenticator = null;
 
