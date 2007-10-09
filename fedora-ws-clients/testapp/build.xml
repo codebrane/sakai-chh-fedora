@@ -32,6 +32,9 @@
     <fileset dir="${fedora.api.m.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
+    <fileset dir="${fedora.foxml.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
   </path>
 
   <!-- CLASSPATH for running the tests -->
@@ -94,6 +97,7 @@
       <formatter type="plain" usefile="false" />
       <classpath refid="classpath" />
       <classpath refid="test.jar.classpath" />
+      <jvmarg value="-Xmx2048M" />
     </junit>
   </target>
 
