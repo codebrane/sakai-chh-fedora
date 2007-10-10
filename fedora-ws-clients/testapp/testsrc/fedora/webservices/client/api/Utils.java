@@ -10,6 +10,8 @@ import org.apache.xmlbeans.XmlOptions;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.io.StringWriter;
+import java.util.HashMap;
 
 /**
  * Utility class to support unit tests
@@ -42,22 +44,44 @@ public class Utils {
    * @param filePath The full path and name of the file
    */
   public static void dumpXML(XmlObject doc, String filePath) {
-    //HashMap namespaces = new HashMap();
-    //namespaces.put(Shibboleth.NS_SAML_10_PROTOCOL, Shibboleth.NS_PREFIX_SAML_10_PROTOCOL);
-    //namespaces.put(Shibboleth.NS_SAML_10_ASSERTION, Shibboleth.NS_PREFIX_SAML_10_ASSERTION);
-    //namespaces.put(Guanxi.NS_SP_NAME_IDENTIFIER, "gxsp");
+    HashMap<String, String> namespaces = new HashMap<String, String>();
+    namespaces.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf");
+    namespaces.put("http://www.nsdl.org/ontologies/relationships#", "myns");
     XmlOptions xmlOptions = new XmlOptions();
     xmlOptions.setSavePrettyPrint();
     xmlOptions.setSavePrettyPrintIndent(2);
     //xmlOptions.setUseDefaultNamespace();
     //xmlOptions.setSaveAggressiveNamespaces();
-    //xmlOptions.setSaveSuggestedPrefixes(namespaces);
+    xmlOptions.setSaveSuggestedPrefixes(namespaces);
     //xmlOptions.setSaveNamespacesFirst();
 
     try {
       doc.save(new File(filePath), xmlOptions);
     }
     catch(Exception e) {
+    }
+  }
+
+  /**
+   * Returns an XMLBeans document as a String with full Fedora/RDF namespace support
+   *
+   * @param doc The document to parse to a String
+   * @return String version of the document. This will contain prefixes for rdf and myns
+   */
+  public static String xmlToString(XmlObject doc) {
+    HashMap<String, String> namespaces = new HashMap<String, String>();
+    namespaces.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf");
+    namespaces.put("http://www.nsdl.org/ontologies/relationships#", "myns");
+    XmlOptions xmlOptions = new XmlOptions();
+    xmlOptions.setSaveSuggestedPrefixes(namespaces);
+    xmlOptions.setSaveAggressiveNamespaces();
+    StringWriter out = new StringWriter();
+    try {
+      doc.save(out, xmlOptions);
+      return out.toString();
+    }
+    catch(Exception e) {
+      return null;
     }
   }
 }
