@@ -26,6 +26,7 @@ public abstract class RepositoryTest {
   protected static final String PROPS_KEY_FEDORA_ADMIN_USERNAME = "fedora.admin.username";
   protected static final String PROPS_KEY_FEDORA_ADMIN_PASSWORD = "fedora.admin.password";
   protected static final String PROPS_KEY_FEDORA_VERSION = "fedora.version";
+  
   protected static final String PROPS_KEY_TEST_INGEST_FILE = "test.file";
   protected static final String PROPS_KEY_TEST_INGEST_FILE_PID = "test.file.pid";
   protected static final String PROPS_KEY_TEST_INGEST_FILE_MIME_TYPE = "test.file.mime.type";
@@ -39,6 +40,12 @@ public abstract class RepositoryTest {
   protected static final String PROPS_KEY_TEST_INGEST_FILE_DESCRIPTION = "test.file.description";
   protected static final String PROPS_KEY_TEST_INGEST_FILE_PUBLISHER = "test.file.publisher";
   protected static final String PROPS_KEY_TEST_INGEST_FILE_IDENTIFIER = "test.file.identifier";
+
+  protected static final String PROPS_KEY_TEST_RELSEXT_MIME_TYPE = "relsext.mime.type";
+  protected static final String PROPS_KEY_TEST_RELSEXT_VERSION_ID = "relsext.version.id";
+  protected static final String PROPS_KEY_TEST_RELSEXT_LABEL = "relsext.label";
+  protected static final String PROPS_KEY_TEST_RELSEXT_OWNER = "relsext.owner";
+
   protected static final String PROPS_KEY_DUMP_INGEST_XML = "ingest.dump";
   protected static final String PROPS_KEY_DUMP_INGEST_XML_FILE = "ingest.dump.file";
   protected static final String PROPS_KEY_DUMP_INGEST_LOG_MESSAGE = "ingest.log.message";
