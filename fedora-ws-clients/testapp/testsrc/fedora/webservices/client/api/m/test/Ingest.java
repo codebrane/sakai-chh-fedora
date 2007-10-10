@@ -131,6 +131,39 @@ public class Ingest extends RepositoryTest {
     // /////////////////////////////////////////////////////////////////////////////////////////////////
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////
+    // RELS-EXT (RDF) relationships for the object
+    DatastreamType rdfDatastream = object.addNewDatastream();
+    rdfDatastream.setID("RELS-EXT");
+    rdfDatastream.setCONTROLGROUP(DatastreamType.CONTROLGROUP.X);
+
+    DatastreamVersionType rdfDatastreamVersion = rdfDatastream.addNewDatastreamVersion();
+    rdfDatastreamVersion.setID(repositoryProperties.getString(PROPS_KEY_TEST_RELSEXT_VERSION_ID));
+    rdfDatastreamVersion.setMIMETYPE(repositoryProperties.getString(PROPS_KEY_TEST_RELSEXT_MIME_TYPE));
+    rdfDatastreamVersion.setLABEL(repositoryProperties.getString(PROPS_KEY_TEST_RELSEXT_LABEL));
+
+    XmlContentType rdfXmlContent = rdfDatastreamVersion.addNewXmlContent();
+
+    Element rdfRoot = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "RDF");
+
+    Element rdfDescription = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "Description");
+    rdfDescription.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "about", "info:fedora/" + repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_PID));
+    rdfRoot.appendChild(rdfDescription);
+
+    /*
+    Element fedIsMemberOfCollection = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("fedora", "isMemberOfCollection");
+    fedIsMemberOfCollection.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource", "info:fedora/test:collection1");
+    rdfDescription.appendChild(fedIsMemberOfCollection);
+    */
+
+    Element owner = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("http://www.nsdl.org/ontologies/relationships#", "owner");
+    Text ownerTextNode = rdfXmlContent.getDomNode().getOwnerDocument().createTextNode(repositoryProperties.getString(PROPS_KEY_TEST_RELSEXT_OWNER));
+    owner.appendChild(ownerTextNode);
+    rdfDescription.appendChild(owner);
+
+    rdfXmlContent.getDomNode().appendChild(rdfRoot);
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
     // Datastream for the object
     DatastreamType objDatastream = object.addNewDatastream();
     objDatastream.setID(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_DATASTREAM_ID));
@@ -145,12 +178,14 @@ public class Ingest extends RepositoryTest {
     objDatastreamVersion.setBinaryContent(Utils.readFile(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE)));
     // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ingest.setObjectXML(objectDoc.toString().getBytes());
+    //ingest.setObjectXML(objectDoc.toString().getBytes());
 
     XmlCursor cursor = objectDoc.newCursor();
     if (cursor.toFirstChild())
       cursor.setAttributeText(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"),
                                         "info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-0.xsd");
+
+    ingest.setObjectXML(Utils.xmlToString(objectDoc).getBytes());
 
     if (repositoryProperties.getString(PROPS_KEY_DUMP_INGEST_XML).equalsIgnoreCase("yes"))
       Utils.dumpXML(objectDoc, repositoryProperties.getString(PROPS_KEY_DUMP_INGEST_XML_FILE));
