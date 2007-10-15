@@ -1,4 +1,5 @@
 <project name="DublinCoreXMLBeans" default="help">
+	<property file="../paths.properties" />
   <property file="build.properties" />
 
   <taskdef name="xmlbean"
@@ -56,5 +57,10 @@
     </javadoc>
 
     <delete dir="${src.gen.dir}"/>
+  </target>
+  
+  <target name="clean" description="Deletes the bean source and api directories">
+    <delete dir="${src.gen.dir}"/>
+    <delete dir="${javadoc.dir}"/>
   </target>
 </project>
