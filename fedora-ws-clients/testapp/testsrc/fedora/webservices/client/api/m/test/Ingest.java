@@ -38,7 +38,7 @@ public class Ingest extends RepositoryTest {
     // java.lang.AssertionError: fedora.server.errors.ObjectValidityException: [DOValidatorImpl]: failed Schematron rules validation. null
     // if this is wrong
     ingest.setFormat(DIGITAL_OBJECT_FORMAT_FOXML);
-    ingest.setLogMessage(repositoryProperties.getString(PROPS_KEY_DUMP_INGEST_LOG_MESSAGE));
+    ingest.setLogMessage(repositoryProperties.getString(PROPS_KEY_INGEST_LOG_MESSAGE));
 
     DigitalObjectDocument objectDoc = DigitalObjectDocument.Factory.newInstance();
     DigitalObjectDocument.DigitalObject object = objectDoc.addNewDigitalObject();
