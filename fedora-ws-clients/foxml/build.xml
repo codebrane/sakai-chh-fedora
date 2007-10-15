@@ -1,4 +1,5 @@
 <project name="FedoraFOXMLBeans" default="help">
+  <property file="../paths.properties" />
   <property file="build.properties" />
 
   <taskdef name="xmlbean"
@@ -13,18 +14,53 @@
 
   <target name="help" description="Displays usage of this build file">
     <echo>
-      ant beans : Builds the Fedora FOXML schema beans
+      ant beans :
+      Builds the Fedora FOXML ${version} schema beans. The libraries will be placed in ${lib.dir}/${beans.jar} and the javadocs in ${javadoc.dir}
     </echo>
   </target>
-
+  
   <target name="beans">
     <mkdir dir="${lib.dir}"/>
+    <mkdir dir="${src.gen.dir}"/>
+    <mkdir dir="${javadoc.dir}"/>
+    <antcall target="_generateBeans"/>
+    <antcall target="_api"/>
+  </target>
 
+  <target name="_generateBeans" description="Generates the beans">
     <xmlbean schema="${xsd.home}"
              download="true"
              noupa="true"
-             destfile="${lib.dir}/${beans.jar}">
+             destfile="${lib.dir}/${beans.jar}"
+             srcgendir="${src.gen.dir}">
       <classpath refid="classpath"/>
     </xmlbean>
+  </target>
+  
+  <target name="_api" description="Generates the beans API in ${javadoc.dir}">
+    <delete dir="${javadoc.dir}"/>
+
+    <javadoc packagenames="${api.package}.*"
+             sourcepath="${src.gen.dir}"
+             defaultexcludes="yes"
+             destdir="${javadoc.dir}"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="Dublin Core ${version} Beans API">
+      <classpath refid="classpath"/>
+      <doctitle><![CDATA[<h1>Fedora FOXML ${version} Beans API</h1>]]></doctitle>
+      <bottom><![CDATA[<i>Fedora FOXML ${version}</i>]]></bottom>
+      <tag name="todo" scope="all" description="To do:"/>
+      <group title="Fedora FOXML ${version} Beans Packages" packages="${api.package}*"/>
+      <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+    </javadoc>
+
+    <delete dir="${src.gen.dir}"/>
+  </target>
+  
+  <target name="clean" description="Deletes the bean source and api directories">
+    <delete dir="${src.gen.dir}"/>
+    <delete dir="${javadoc.dir}"/>
   </target>
 </project>
