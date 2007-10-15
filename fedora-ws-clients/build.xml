@@ -1,4 +1,5 @@
 <project name="FedoraWebServices" default="usage">
+  <property file="paths.properties" />
   <property file="repository.properties" />
   <property file="build.properties" />
 	
@@ -115,6 +116,8 @@
   <target name="clean" description="Deletes the build directory">
     <delete dir="${ws.build.dir}"/>
     <ant antfile="build.xml" dir="${tests.dir}" target="${tests.target.clean}"/>
+    <ant antfile="build.xml" dir="${foxml.dir}" target="${foxml.target.clean}"/>
+    <ant antfile="build.xml" dir="${dublincore.dir}" target="${dublincore.target.clean}"/>
   </target>
   
   <target name="clients"
@@ -128,14 +131,19 @@
           description="Builds the libraries for working with Fedora FOXML">
     <ant antfile="build.xml" dir="${foxml.dir}" target="${foxml.target.build}"/>
   </target>
-  
+
+  <target name="dublincore"
+          description="Builds the libraries for working with Dublin Core">
+    <ant antfile="build.xml" dir="${dublincore.dir}" target="${dublincore.target.build}"/>
+  </target>
+
   <target name="run-tests" description="Runs the tests">
     <ant antfile="build.xml" dir="${tests.dir}" target="${tests.target}"/>
   </target>
   
   <target name="all"
   				description="Generates and compiles the clients and runs the tests"
-  				depends="foxml, clients, run-tests" />
+  				depends="foxml, dublincore, clients, run-tests" />
   
   <target name="usage">
   	<echo>
