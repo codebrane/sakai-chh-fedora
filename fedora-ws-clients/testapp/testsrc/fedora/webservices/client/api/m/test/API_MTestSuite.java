@@ -14,6 +14,9 @@ import org.junit.runners.Suite;
  * @author Alistair Young
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { DescribeUser.class })
+@Suite.SuiteClasses( { DescribeUser.class,
+                       Ingest.class,
+                       Purge.class,
+                       SetOwner.class })
 public class API_MTestSuite {
 }
