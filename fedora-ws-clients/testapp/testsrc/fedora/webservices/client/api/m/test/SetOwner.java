@@ -16,9 +16,30 @@ import org.apache.axis2.transport.http.HTTPConstants;
 
 import java.rmi.RemoteException;
 
+/**
+ * Test for the API-M modifyObject web service method
+ *
+ * <a href="http://www.fedora.info/wiki/index.php/ModifyObject">modifyObject documentation</a>
+ * @author Alistair Young
+ */
 public class SetOwner extends RepositoryTest {
+  private boolean standalone = true;
+
+  /**
+   * Other unit tests can call this method to bypass setup and cleanup of a new object
+   */
+  public void modifyObjectFromTest() {
+    standalone = false;
+    modifyObject();
+  }
+  
   @Test
   public void modifyObject() {
+    if (standalone) {
+      Ingest ingestTest = new Ingest();
+      ingestTest.ingest();
+    }
+
     ModifyObjectDocument doc = ModifyObjectDocument.Factory.newInstance();
     ModifyObjectDocument.ModifyObject modifyObject = doc.addNewModifyObject();
 
@@ -39,6 +60,11 @@ public class SetOwner extends RepositoryTest {
     }
     catch(RemoteException re) {
       fail(re.getMessage());
+    }
+
+    if (standalone) {
+      Purge purgeTest = new Purge();
+      purgeTest.purgeObject();
     }
   }
 }
