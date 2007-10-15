@@ -48,7 +48,8 @@ public abstract class RepositoryTest {
 
   protected static final String PROPS_KEY_DUMP_INGEST_XML = "ingest.dump";
   protected static final String PROPS_KEY_DUMP_INGEST_XML_FILE = "ingest.dump.file";
-  protected static final String PROPS_KEY_DUMP_INGEST_LOG_MESSAGE = "ingest.log.message";
+  protected static final String PROPS_KEY_INGEST_LOG_MESSAGE = "ingest.log.message";
+  protected static final String PROPS_KEY_PURGE_LOG_MESSAGE = "purge.log.message";
 
   protected static ResourceBundle repositoryProperties = null;
   protected static HttpTransportProperties.Authenticator authenticator = null;
