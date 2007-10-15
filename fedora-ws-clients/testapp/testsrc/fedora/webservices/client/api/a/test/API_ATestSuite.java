@@ -14,6 +14,7 @@ import org.junit.runners.Suite;
  * @author Alistair Young
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { DescribeRepository.class })
+@Suite.SuiteClasses( { DescribeRepository.class,
+                       Search.class })
 public class API_ATestSuite {
 }
