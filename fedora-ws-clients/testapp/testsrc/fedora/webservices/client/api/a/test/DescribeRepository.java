@@ -32,10 +32,10 @@ public class DescribeRepository extends RepositoryTest {
     try {
       // The truststore will be autopopulated with the fedora server cert via probing
       Protocol authhttps = new Protocol("https",
-                                        new FedoraProtocolSocketFactory("/Users/alistair/Desktop/keystore.jks",
-                                                                         "hohoho",
-                                                                         "/Users/alistair/Desktop/truststore",
-                                                                         "hohoho"),
+                                        new FedoraProtocolSocketFactory(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION),
+                                                                         repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
+                                                                         repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION),
+                                                                         repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD)),
                                         443);
       Protocol.registerProtocol("https", authhttps);
       
