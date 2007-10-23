@@ -11,7 +11,6 @@ import info.fedora.definitions.x1.x0.types.DescribeRepositoryDocument;
 import info.fedora.definitions.x1.x0.types.DescribeRepositoryResponseDocument;
 import info.fedora.definitions.x1.x0.types.RepositoryInfo;
 import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.commons.httpclient.protocol.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -30,15 +29,6 @@ public class DescribeRepository extends RepositoryTest {
     doc.addNewDescribeRepository();
 
     try {
-      // The truststore will be autopopulated with the fedora server cert via probing
-      Protocol authhttps = new Protocol("https",
-                                        new FedoraProtocolSocketFactory(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION),
-                                                                         repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
-                                                                         repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION),
-                                                                         repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD)),
-                                        443);
-      Protocol.registerProtocol("https", authhttps);
-      
       // Initiate the client connection to the API-A endpoint
       FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repositoryProperties.getString(PROPS_KEY_API_A_ENDPOINT));
 
