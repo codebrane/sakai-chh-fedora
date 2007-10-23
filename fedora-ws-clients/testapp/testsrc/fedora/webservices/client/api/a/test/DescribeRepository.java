@@ -5,16 +5,15 @@
 
 package fedora.webservices.client.api.a.test;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.apache.axis2.transport.http.HttpTransportProperties;
-import org.apache.axis2.transport.http.HTTPConstants;
+import fedora.webservices.client.api.RepositoryTest;
+import fedora.webservices.client.api.a.FedoraAPIAServiceStub;
 import info.fedora.definitions.x1.x0.types.DescribeRepositoryDocument;
 import info.fedora.definitions.x1.x0.types.DescribeRepositoryResponseDocument;
 import info.fedora.definitions.x1.x0.types.RepositoryInfo;
-import fedora.webservices.client.api.a.FedoraAPIAServiceStub;
-import fedora.webservices.client.api.RepositoryTest;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.httpclient.protocol.*;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.rmi.RemoteException;
 
@@ -31,6 +30,15 @@ public class DescribeRepository extends RepositoryTest {
     doc.addNewDescribeRepository();
 
     try {
+      // The truststore will be autopopulated with the fedora server cert via probing
+      Protocol authhttps = new Protocol("https",
+                                        new FedoraProtocolSocketFactory("/Users/alistair/Desktop/keystore.jks",
+                                                                         "hohoho",
+                                                                         "/Users/alistair/Desktop/truststore",
+                                                                         "hohoho"),
+                                        443);
+      Protocol.registerProtocol("https", authhttps);
+      
       // Initiate the client connection to the API-A endpoint
       FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repositoryProperties.getString(PROPS_KEY_API_A_ENDPOINT));
 
