@@ -4,7 +4,6 @@ import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.guanxi.common.GuanxiException;
-import org.guanxi.common.security.ssl.GuanxiX509ProbingTrustManager;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.*;
@@ -63,25 +62,46 @@ public class FedoraProtocolSocketFactory implements ProtocolSocketFactory {
     return ks;
   }
 
-  private static KeyManager[] createKeyManagers(final KeyStore keystore, final String password)
+  private static KeyManager[] createKeyManagers(KeyStore keystore, String password)
       throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
     KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
     kmfactory.init(keystore, password != null ? password.toCharArray(): null);
     return kmfactory.getKeyManagers();
   }
 
-  private static TrustManager[] createTrustManagers(KeyStore keystore) throws KeyStoreException, NoSuchAlgorithmException {
-    TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    tmfactory.init(keystore);
+  /**
+   * For this to work, the truststore must be populated with server certificates
+   * 
+   * @param truststorePath
+   * @param truststorePassword
+   * @return
+   * @throws KeyStoreException
+   * @throws NoSuchAlgorithmException
+   */
+  private static TrustManager[] createTrustManagers(String truststorePath, String truststorePassword) throws KeyStoreException, NoSuchAlgorithmException {
+    try {
+      // First, get the default TrustManagerFactory.
+      TrustManagerFactory tmFact = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 
-    TrustManager[] trustmanagers = tmfactory.getTrustManagers();
-    for (int i = 0; i < trustmanagers.length; i++) {
-      if (trustmanagers[i] instanceof X509TrustManager) {
-        trustmanagers[i] = new GuanxiX509ProbingTrustManager();
-      }
+      // Next, set up the TrustStore to use. We need to load the file into
+      // a KeyStore instance.
+      FileInputStream fis = new FileInputStream(truststorePath);
+      KeyStore ks = KeyStore.getInstance("jks");
+      ks.load(fis, truststorePassword.toCharArray());
+      fis.close();
+
+      // Now we initialise the TrustManagerFactory with this KeyStore
+      tmFact.init(ks);
+
+      // And now get the TrustManagers
+      return tmFact.getTrustManagers();
     }
-
-    return trustmanagers;
+    catch(IOException ioe) {
+      return null;
+    }
+    catch(CertificateException ce) {
+      return null;
+    }
   }
 
   private SSLContext createSSLContext() throws GuanxiException {
@@ -90,13 +110,13 @@ public class FedoraProtocolSocketFactory implements ProtocolSocketFactory {
       TrustManager[] trustmanagers = null;
 
       if (keystorePath != null) {
-        KeyStore keystore = createKeyStore(this.keystorePath, this.keystorePassword);
-        keymanagers = createKeyManagers(keystore, this.keystorePassword);
+        KeyStore keystore = createKeyStore(keystorePath, keystorePassword);
+        keymanagers = createKeyManagers(keystore, keystorePassword);
       }
 
       if (truststorePath != null) {
-        KeyStore keystore = createKeyStore(this.truststorePath, this.truststorePassword);
-        trustmanagers = createTrustManagers(keystore);
+        createKeyStore(truststorePath, truststorePassword);
+        trustmanagers = createTrustManagers(truststorePath, truststorePassword);
       }
 
       SSLContext sslcontext = SSLContext.getInstance("SSL");
@@ -120,16 +140,16 @@ public class FedoraProtocolSocketFactory implements ProtocolSocketFactory {
   }
 
   private SSLContext getSSLContext() {
-    if (this.sslcontext == null) {
+    if (sslcontext == null) {
       try {
-        this.sslcontext = createSSLContext();
+        sslcontext = createSSLContext();
       }
       catch(GuanxiException ge) {
         return null;
       }
     }
 
-    return this.sslcontext;
+    return sslcontext;
   }
 
   /**
