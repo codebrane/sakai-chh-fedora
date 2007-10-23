@@ -161,14 +161,15 @@ public abstract class RepositoryTest {
    */
   private static void createTruststore() {
     try {
-    KeyStore ks = KeyStore.getInstance("JKS");
+      KeyStore ks = KeyStore.getInstance("JKS");
 
-    // Does the keystore exist?
-    File keyStore = new File(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION));
-    if (keyStore.exists())
-      ks.load(new FileInputStream(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION)), repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD).toCharArray());
-    else
-      ks.load(null, null);
+      // Does the keystore exist?
+      File keyStore = new File(repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION));
+      if (!keyStore.exists()) {
+        ks.load(null, null);
+        ks.store(new FileOutputStream(repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION)),
+                                      repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD).toCharArray());
+      }
     }
     catch(Exception e) {
       fail(e.getMessage());
@@ -183,7 +184,7 @@ public abstract class RepositoryTest {
     try {
       EntityConnection connection = new EntityConnection(repositoryProperties.getString(PROPS_KEY_API_M_ENDPOINT),
                                                          repositoryProperties.getString(PROPS_KEY_KEYSTORE_CERT_ALIAS),
-                                                         repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
+                                                         repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION),
                                                          repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
                                                          repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION),
                                                          repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD),
