@@ -6,6 +6,7 @@
 package fedora.webservices.client.api;
 
 import org.apache.axis2.transport.http.HttpTransportProperties;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.guanxi.common.EntityConnection;
 import org.guanxi.common.definitions.Guanxi;
@@ -22,6 +23,8 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ResourceBundle;
+
+import fedora.webservices.client.api.a.test.FedoraProtocolSocketFactory;
 
 /**
  * This is the base class that all Fedora web services test classes must extend. It provides
@@ -95,6 +98,15 @@ public abstract class RepositoryTest {
     createKeystore();
     createTruststore();
     getServerCert();
+
+    // The truststore will be autopopulated with the fedora server cert via probing
+    Protocol authhttps = new Protocol("https",
+                                      new FedoraProtocolSocketFactory(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION),
+                                                                      repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
+                                                                      repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION),
+                                                                      repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD)),
+                                      443);
+    Protocol.registerProtocol("https", authhttps);
   }
 
   /**
