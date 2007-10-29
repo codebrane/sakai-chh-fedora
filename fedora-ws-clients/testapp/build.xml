@@ -35,6 +35,9 @@
     <fileset dir="${fedora.foxml.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
+    <fileset dir="${guanxi.common.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
   </path>
 
   <!-- CLASSPATH for running the tests -->
