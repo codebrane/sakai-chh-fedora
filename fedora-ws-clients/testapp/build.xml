@@ -41,6 +41,9 @@
     <fileset dir="${bouncycastle.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
+    <fileset dir="${xmlsec.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
   </path>
 
   <!-- CLASSPATH for running the tests -->
