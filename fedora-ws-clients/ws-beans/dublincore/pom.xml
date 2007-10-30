@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+	<name>Dublin Core</name>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>dublincore</artifactId>
+  <groupId>dublincore</groupId>
+  <version>2002-12-12</version>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <build>
+    <plugins>
+
+			<!-- http://dublincore.org/schemas/xmls/ -->
+			<plugin>
+    		<groupId>org.codehaus.mojo</groupId>
+    		<artifactId>xmlbeans-maven-plugin</artifactId>
+    		<executions>
+       		<execution>
+          	<goals>
+            	 <goal>xmlbeans</goal>
+          	</goals>
+       		</execution>
+    		</executions>
+    		<inherited>true</inherited>
+    		<configuration>
+       		<schemaDirectory>${basedir}/xsd</schemaDirectory>
+       		<download>true</download>
+       		<noUpa>true</noUpa>
+    		</configuration>
+  		</plugin>      
+  		
+    </plugins>
+  </build>
+</project>
