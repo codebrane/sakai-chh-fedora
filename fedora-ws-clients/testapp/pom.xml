@@ -177,7 +177,7 @@
 
     <testResources>
       <testResource>
-        <directory>${basedir}/testapp/testsrc</directory>
+        <directory>${basedir}/testsrc</directory>
         <includes>
           <include>**/*.properties</include>
         </includes>
