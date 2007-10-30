@@ -1,5 +1,5 @@
 <project name="FedoraWebServices" default="usage">
-  <property file="../paths.properties" />
+  <property file="paths.properties" />
   <property file="repository.properties" />
   <property file="build.properties" />
 	
