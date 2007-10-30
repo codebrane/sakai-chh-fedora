@@ -171,7 +171,7 @@
       </plugin>
     </plugins>
     
-    <testSourceDirectory>testapp/testsrc</testSourceDirectory>
+    <testSourceDirectory>testsrc</testSourceDirectory>
     
     <resources/>
 
