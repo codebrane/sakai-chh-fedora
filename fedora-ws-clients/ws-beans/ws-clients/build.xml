@@ -115,35 +115,18 @@
 
   <target name="clean" description="Deletes the build directory">
     <delete dir="${ws.build.dir}"/>
-    <ant antfile="build.xml" dir="${tests.dir}" target="${tests.target.clean}"/>
-    <ant antfile="build.xml" dir="${foxml.dir}" target="${foxml.target.clean}"/>
-    <ant antfile="build.xml" dir="${dublincore.dir}" target="${dublincore.target.clean}"/>
   </target>
   
-  <target name="clients"
+  <target name="beans"
           description="Builds all the Fedora web service clients"
           depends="clean">
     <antcall target="api-a" />
     <antcall target="api-m" />
   </target>
 
-  <target name="foxml"
-          description="Builds the libraries for working with Fedora FOXML">
-    <ant antfile="build.xml" dir="${foxml.dir}" target="${foxml.target.build}"/>
-  </target>
-
-  <target name="dublincore"
-          description="Builds the libraries for working with Dublin Core">
-    <ant antfile="build.xml" dir="${dublincore.dir}" target="${dublincore.target.build}"/>
-  </target>
-
-  <target name="run-tests" description="Runs the tests">
-    <ant antfile="build.xml" dir="${tests.dir}" target="${tests.target}"/>
-  </target>
-  
   <target name="all"
   				description="Generates and compiles the clients and runs the tests"
-  				depends="foxml, dublincore, clients, run-tests" />
+  				depends="beans" />
   
   <target name="usage">
   	<echo>
@@ -156,13 +139,10 @@
   		Client libraries can be found in the directories:
   		build/SERVICE_TYPE/client/${fedora.version}/dist
   		
-  		all		: Generates and compiles the clients and FOXML libraries and runs all the tests. You need to install and start Fedora first.
-  		clients		: Generates client libraries for all services.
-		foxml		: Generates the Fedora FOXML libraries for describing digital objects.
+  		beans		: Generates client libraries for all services.
   		api-a		: Generates client libraries for the API-A service.
   		api-m		: Generates client libraries for the API-M service.
-  		run-tests	: Runs the web services tests. You need to install and start Fedora first.
-      clean   : Cleans the client and tests builds.
+      	clean   	: Cleans the client and tests builds.
     </echo>
   </target>
 </project>
