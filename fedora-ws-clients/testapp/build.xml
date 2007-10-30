@@ -35,6 +35,14 @@
     <fileset dir="${fedora.foxml.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
+<<<<<<< .mine
+    <fileset dir="${guanxi.common.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${bouncycastle.lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+=======
     <fileset dir="${guanxi.common.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
@@ -44,6 +52,7 @@
     <fileset dir="${xmlsec.lib.dir}">
       <include name="**/*.jar" />
     </fileset>
+>>>>>>> .r201
   </path>
 
   <!-- CLASSPATH for running the tests -->
