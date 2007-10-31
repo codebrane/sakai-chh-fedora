@@ -1,11 +1,11 @@
-<xb:config xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config" xmlns:chh="org:sakaiproject:content:chh">
+<xb:config xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config" xmlns:chh="org:sakaiproject:content:chh:fedora">
 
   <!-- Namespaces to package mappings -->
-  <xb:namespace uri="org:sakaiproject:content:chh">
-    <xb:package>org.sakaiproject.content.chh.beans</xb:package>
+  <xb:namespace uri="org:sakaiproject:content:chh:fedora">
+    <xb:package>org.sakaiproject.content.chh.fedora.beans</xb:package>
   </xb:namespace>
 
   <!-- Mappings from types defined in mountpoint.xsd to Java classes -->
-  <xb:qname name="chh:mountPointType" javaname="MountPoint"/>
+  <xb:qname name="chh:fedoraMountPointType" javaname="FedoraMountPoint"/>
 
 </xb:config>
