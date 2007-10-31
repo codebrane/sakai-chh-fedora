@@ -29,7 +29,7 @@
 
     <dependency>
       <groupId>org.sakaiproject</groupId>
-      <artifactId>sakai-content-chh-fedora</artifactId>
+      <artifactId>sakai-content-chh-fedora-impl</artifactId>
       <version>${sakai.version}</version>
     </dependency>
 
