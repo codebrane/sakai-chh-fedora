@@ -10,7 +10,17 @@
 	  <property name="contentHostingHandlerResolver" >
 	    <ref bean="org.sakaiproject.content.api.ContentHostingHandlerResolver"/>
 	  </property>
+
+    <property name="repoFactory" >
+      <ref bean="uk.ac.uhi.ral.impl.FedoraDigitalRepositoryFactory"/>
+    </property>
 	
-	</bean>
-	
+  </bean>
+
+  <bean id="uk.ac.uhi.ral.impl.FedoraDigitalRepositoryFactory"
+        class="uk.ac.uhi.ral.impl.FedoraDigitalRepositoryFactory">
+    <property name="truststorePath"><value>TEST</value></property>
+    <property name="truststorePassword"><value>TEST</value></property>
+  </bean>
+
 </beans>
