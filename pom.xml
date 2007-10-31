@@ -51,7 +51,8 @@
   </repositories>
 
   <modules>
-    <module>content-chh/content-chh-impl</module>
+    <module>content-chh/content-chh-impl/impl</module>
+    <module>content-chh/content-chh-impl/pack</module>
     <module>content-chh/content-chh-test</module>
     <module>fedora-ws-clients/testapp</module>
   </modules>
