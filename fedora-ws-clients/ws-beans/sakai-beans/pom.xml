@@ -32,6 +32,9 @@
        		<schemaDirectory>${basedir}/xsd</schemaDirectory>
        		<download>true</download>
        		<noUpa>true</noUpa>
+       		<xmlConfigs>
+       			<xmlConfig implementation="java.io.File">${basedir}/xsd/mountpoint.xsdconfig</xmlConfig>
+       		</xmlConfigs>
     		</configuration>
   		</plugin>      
   		
