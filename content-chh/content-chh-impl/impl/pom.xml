@@ -6,7 +6,7 @@
     <artifactId>content-chh-fedora-base</artifactId>
     <groupId>org.sakaiproject</groupId>
     <version>M2</version>
-    <relativePath>../../pom.xml</relativePath>
+    <relativePath>../../../pom.xml</relativePath>
   </parent>
   
   <name>sakai-content-chh-fedora-impl</name>
@@ -27,6 +27,13 @@
   
   <dependencies>
 
+		<!-- **************************************************** -->
+		<!-- Sakai -->
+		<dependency>
+      <groupId>org.sakaiproject</groupId>
+      <artifactId>sakai-tool-api</artifactId>
+    </dependency>
+    
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-content-api</artifactId>
@@ -36,11 +43,7 @@
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-entity-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
+    <!-- **************************************************** -->
 
     <dependency>
       <groupId>org.sakaiproject</groupId>
@@ -52,42 +55,69 @@
       <artifactId>sakai-chh-beans</artifactId>
       <version>1.0.0</version>
     </dependency>
-
+    <!-- **************************************************** -->
+    
+		<!-- **************************************************** -->
+  	<!-- Generated Fedora web services clients -->
     <dependency>
       <groupId>fedora</groupId>
       <artifactId>fedora-api-a-client</artifactId>
       <version>2.2.1</version>
     </dependency>
-
+    
     <dependency>
       <groupId>fedora</groupId>
       <artifactId>fedora-api-m-client</artifactId>
       <version>2.2.1</version>
     </dependency>
-
+    
     <dependency>
       <groupId>fedora</groupId>
       <artifactId>fedora-foxml</artifactId>
       <version>1.0</version>
+    </dependency>
+    <!-- **************************************************** -->
+    
+		<!-- **************************************************** -->
+    <!-- XMLBeans -->
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>jsr173_1.0_api</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xbean</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+    <!-- **************************************************** -->
+    
+    <!-- **************************************************** -->
+    <!-- Axis2 -->
+		<dependency>
+			<groupId>org.apache.axis2</groupId>
+			<artifactId>axis2-kernel</artifactId>
+			<version>1.3</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- **************************************************** -->
+    
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
     </dependency>
 
     <dependency>
       <groupId>dublincore</groupId>
       <artifactId>dublincore</artifactId>
       <version>2002-12-12</version>
-    </dependency>
-
-    <!-- Third party dependencies -->
-    <dependency>
-      <groupId>org.apache.xmlbeans</groupId>
-      <artifactId>xbean</artifactId>
-      <version>2.3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.xmlbeans</groupId>
-      <artifactId>jsr173_1.0_api</artifactId>
-      <version>2.3.0</version>
     </dependency>
 
   </dependencies>
