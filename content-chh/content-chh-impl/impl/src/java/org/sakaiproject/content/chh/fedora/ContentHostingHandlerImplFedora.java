@@ -3,17 +3,20 @@
  */
 package org.sakaiproject.content.chh.fedora;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-
-import org.sakaiproject.exception.ServerOverloadException;
-import org.sakaiproject.content.api.*;
-import org.sakaiproject.content.chh.beans.MountPointDocument;
-import org.sakaiproject.content.chh.beans.MountPoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xmlbeans.XmlException;
+import org.sakaiproject.content.api.*;
+import org.sakaiproject.content.chh.fedora.beans.FedoraDocument;
+import org.sakaiproject.content.chh.fedora.beans.FedoraMountPoint;
+import org.sakaiproject.exception.ServerOverloadException;
+import org.sakaiproject.tool.cover.SessionManager;
+import uk.ac.uhi.ral.DigitalRepository;
+import uk.ac.uhi.ral.DigitalRepositoryFactory;
+
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -26,6 +29,25 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 
   /** The Sakai content hosting resolver */
   private ContentHostingHandlerResolver contentHostingHandlerResolver = null;
+
+  /** The repository factory implementation to use */
+  private DigitalRepositoryFactory repoFactory = null;
+
+  /**
+   * Retrieves the DigitalRepositoryFactory we are using
+   * @return DigitalRepositoryFactory we are using
+   */
+  public DigitalRepositoryFactory getRepository() {
+    return repoFactory;
+  }
+
+  /**
+   * Sets the DigitalRepositoryFactory to use. Injected by Spring from components.xml
+   * @param repoFactory DigitalRepositoryFactory to use
+   */
+  public void setRepoFactory(DigitalRepositoryFactory repoFactory) {
+    this.repoFactory = repoFactory;
+  }
 
   /**
    * Sets the Sakai ContentHostingHandlerResolver to use. Injected by Spring from components.xml
@@ -154,13 +176,16 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 */
 	public ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
     byte[] content = null;
-    MountPoint fedoraMountPoint = null;
 
     try {
       // The content of the resource is XML defining the Fedora connection properties
       content = ((ContentResource)edit).getContent();
-      MountPointDocument doc = MountPointDocument.Factory.parse(new String(content));
-      fedoraMountPoint = doc.getMountPoint();
+      FedoraDocument doc = FedoraDocument.Factory.parse(new String(content));
+
+      SessionManager.getCurrentSession().getUserEid();
+
+      DigitalRepository repo = repoFactory.create();
+      repo.init(doc.getFedora());
     }
     catch(ServerOverloadException soe) {
       log.error("Can't get Fedora mountpoint content", soe);
