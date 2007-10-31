@@ -9,9 +9,9 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   
-  <name>sakai-content-chh-fedora</name>
+  <name>sakai-content-chh-fedora-impl</name>
   <groupId>org.sakaiproject</groupId>
-  <artifactId>sakai-content-chh-fedora</artifactId>
+  <artifactId>sakai-content-chh-fedora-impl</artifactId>
   
   <organization>
     <name>UHI Millennium Institute</name>
