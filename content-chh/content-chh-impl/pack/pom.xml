@@ -6,7 +6,7 @@
     <artifactId>content-chh-fedora-base</artifactId>
     <groupId>org.sakaiproject</groupId>
     <version>M2</version>
-    <relativePath>../../pom.xml</relativePath>
+    <relativePath>../../../pom.xml</relativePath>
   </parent>
   
   <name>sakai-content-chh-fedora-pack</name>
