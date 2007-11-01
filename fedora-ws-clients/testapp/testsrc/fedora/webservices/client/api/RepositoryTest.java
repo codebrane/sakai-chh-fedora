@@ -76,6 +76,8 @@ public abstract class RepositoryTest {
   protected static ResourceBundle repositoryProperties = null;
   protected static HttpTransportProperties.Authenticator authenticator = null;
 
+  protected static Protocol authhttps = null;
+
   private static boolean okToUnloadBCProvider = false;
 
   @BeforeClass
@@ -100,13 +102,14 @@ public abstract class RepositoryTest {
     getServerCert();
 
     // The truststore will be autopopulated with the fedora server cert via probing
-    Protocol authhttps = new Protocol("https",
-                                      new FedoraProtocolSocketFactory(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION),
-                                                                      repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
-                                                                      repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION),
-                                                                      repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD)),
-                                      443);
-    Protocol.registerProtocol("https", authhttps);
+    // http://jakarta.apache.org/httpcomponents/httpclient-3.x/sslguide.html
+    // http://wso2.org/library/1646
+    authhttps = new Protocol("https",
+                             new FedoraProtocolSocketFactory(repositoryProperties.getString(PROPS_KEY_KEYSTORE_LOCATION),
+                                                             repositoryProperties.getString(PROPS_KEY_KEYSTORE_PASSWORD),
+                                                             repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_LOCATION),
+                                                             repositoryProperties.getString(PROPS_KEY_TRUSTSTORE_PASSWORD)),
+                             443);
   }
 
   /**
@@ -214,5 +217,9 @@ public abstract class RepositoryTest {
     catch(Exception e) {
       fail(e.getMessage());
     }
+  }
+
+  protected static String getProtocol(String protocol) {
+    return protocol.split(":")[0];
   }
 }
