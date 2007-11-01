@@ -33,6 +33,8 @@ public class DescribeUser extends RepositoryTest {
 
       // Add the auth creds to the client
       stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      // Register our custom SSL handler for this connection
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, authhttps);
 
       // Call the web service
       DescribeUserResponseDocument outDoc = stub.describeUser(doc);

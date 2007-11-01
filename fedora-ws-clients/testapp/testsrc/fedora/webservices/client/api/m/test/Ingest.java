@@ -5,19 +5,19 @@
 
 package fedora.webservices.client.api.m.test;
 
+import fedora.fedoraSystemDef.foxml.*;
 import fedora.webservices.client.api.RepositoryTest;
 import fedora.webservices.client.api.Utils;
 import fedora.webservices.client.api.m.FedoraAPIMServiceStub;
-import fedora.fedoraSystemDef.foxml.*;
-import org.junit.Test;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.xmlbeans.XmlCursor;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 import info.fedora.definitions.x1.x0.types.IngestDocument;
 import info.fedora.definitions.x1.x0.types.IngestResponseDocument;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.xmlbeans.XmlCursor;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import org.junit.Test;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import javax.xml.namespace.QName;
 import java.rmi.RemoteException;
@@ -196,6 +196,8 @@ public class Ingest extends RepositoryTest {
 
       // Add the auth creds to the client
       stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      // Register our custom SSL handler for this connection
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, authhttps);
 
       // Call the web service
       IngestResponseDocument outDoc = stub.ingest(doc);
