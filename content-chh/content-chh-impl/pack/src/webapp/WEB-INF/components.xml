@@ -23,4 +23,19 @@
     <property name="truststorePassword"><value>TEST</value></property>
   </bean>
 
+  <!--
+    The Fedora mount point resource is a properties style file. You can copy/paste this template
+    and customise for your Fedora. When you upload the file, set the mountpoint to:
+
+    uk.ac.uhi.it.ContentHostingHandlerImplFedora
+
+    template:
+    
+    api-a.endpoint=http://your.fedora.url/fedora/services/access
+    api-m.endpoint=http://your.fedora.url/fedora/services/management
+    connection.username=USERNAME
+    connection.password=PASSWORD
+
+  -->
+
 </beans>
