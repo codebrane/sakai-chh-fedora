@@ -5,18 +5,18 @@ package org.sakaiproject.content.chh.fedora;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xmlbeans.XmlException;
 import org.sakaiproject.content.api.*;
-import org.sakaiproject.content.chh.fedora.beans.FedoraDocument;
-import org.sakaiproject.content.chh.fedora.beans.FedoraMountPoint;
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.PropertyResourceBundle;
 
 /**
  *
@@ -175,23 +175,20 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
-    byte[] content = null;
-
     try {
       // The content of the resource is XML defining the Fedora connection properties
-      content = ((ContentResource)edit).getContent();
-      FedoraDocument doc = FedoraDocument.Factory.parse(new String(content));
+      PropertyResourceBundle config = new PropertyResourceBundle(new ByteArrayInputStream(((ContentResource)edit).getContent()));
 
       SessionManager.getCurrentSession().getUserEid();
 
       DigitalRepository repo = repoFactory.create();
-      repo.init(doc.getFedora());
+      repo.init(config);
+    }
+    catch(IOException ioe) {
+      log.error("Can't load fedora config", ioe);
     }
     catch(ServerOverloadException soe) {
       log.error("Can't get Fedora mountpoint content", soe);
-    }
-    catch(XmlException xe) {
-      log.error("Can't parse Fedora mountpoint content", xe);
     }
 
     return null;
