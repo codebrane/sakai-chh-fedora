@@ -21,10 +21,13 @@
 
 package org.sakaiproject.content.chh.fedora;
 
+import org.sakaiproject.content.api.ContentCollection;
+import org.sakaiproject.content.api.ContentEntity;
+import org.sakaiproject.time.api.Time;
+
 import java.util.List;
 
-import org.sakaiproject.content.api.ContentCollection;
-import org.sakaiproject.time.api.Time;
+import info.fedora.definitions.x1.x0.types.ObjectFields;
 
 /**
 * <p>ContentCollection is the core interface for a Collection object in the GenericContentHostingService.</p>
@@ -34,7 +37,10 @@ import org.sakaiproject.time.api.Time;
 * @version $Revision: 19673 $
 */
 public class ContentCollectionFedora extends ContentEntityFedora implements ContentCollection {
-	/**
+  public ContentCollectionFedora(ContentEntity realParent, ObjectFields[] fields) {
+  }
+
+  /**
 	* Access a List of the collection's internal members, each a resource id String.
 	* @return a List of the collection's internal members, each a resource id String (may be empty).
 	*/
