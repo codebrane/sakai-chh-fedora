@@ -98,7 +98,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   public void deleteObject() {}
   public void search() {}
 
-  public ContentEntity list() {
+  public ContentEntity list(ContentEntity realParent) {
     // Build a new request document
     FindObjectsDocument doc = FindObjectsDocument.Factory.newInstance();
 
@@ -128,7 +128,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     //params.setMaxResults(null);
     params.setMaxResults(new BigInteger("999999999")); // null = no limit on results
 
-    ContentEntity ce = null;
+    ContentCollectionFedora collection = null;
     
     try {
       // Initiate the client connection to the API-A endpoint
@@ -144,19 +144,15 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
       ObjectFields[] fields = outDoc.getFindObjectsResponse().getResult().getResultList().getObjectFieldsArray();
 
-      ContentCollectionFedora collection = new ContentCollectionFedora();
+      collection = new ContentCollectionFedora(realParent, fields);
 
-      for (ObjectFields field : fields) {
-        contentHostingHandlerResolver.newResourceEdit(field.getPid());
-      }
+      collection.setContentHandler(chh);
+      //ce.setVirtualContentEntity(this);
+
+      return collection;
     }
     catch(RemoteException re) {
       return null;
     }
-
-    ce.setContentHandler(chh);
-    //ce.setVirtualContentEntity(this);
-    
-    return ce;
   }
 }
