@@ -32,13 +32,20 @@ import org.w3c.dom.Document;
 import java.util.Collection;
 import java.util.Stack;
 
+import info.fedora.definitions.x1.x0.types.ObjectFields;
+
 public abstract class ContentEntityFedora implements ContentEntity {
-	/**
+  protected ContentHostingHandler chh = null;
+  protected ContentEntity ce = null;
+  protected ContentEntity realParent = null;
+  protected ObjectFields[] fields = null;
+
+  /**
 	 * Access this ContentEntity's containing collection, or null if this entity is the site collection.
 	 * @return
 	 */
 	public ContentCollection getContainingCollection() {
-		return null;
+		return realParent.getContainingCollection();
 	}
 	
 	/**
@@ -63,7 +70,7 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public String getResourceType() {
-		return null;
+		return realParent.getResourceType();
 	}
 	
 	/**
@@ -71,7 +78,7 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public ContentHostingHandler getContentHandler() {
-		return new ContentHostingHandlerImplFedora();
+		return chh;
 	}
 	
 	/**
@@ -79,14 +86,15 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * @param chh
 	 */
 	public void setContentHandler(ContentHostingHandler chh) {
-	}
+    this.chh = chh;
+  }
 	
 	/**
 	 * 
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity() {
-		return null;
+		return ce;
 	}
 	
 	/**
@@ -94,7 +102,8 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * @param ce
 	 */
 	public void setVirtualContentEntity(ContentEntity ce) {
-	}
+    this.ce = ce;
+  }
 	
 	/**
 	 * 
@@ -107,35 +116,35 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	
   /* Junk required by GroupAwareEntity superinterface */
   public Collection getGroups() {
-    return null;
+    return realParent.getGroups();
   }
 
   public Collection getGroupObjects() {
-    return null;
+    return realParent.getGroupObjects();
   }
 
   public AccessMode getAccess() {
-    return null;
+    return realParent.getAccess();
   }
 
   public Collection getInheritedGroups() {
-    return null;
+    return realParent.getInheritedGroups();
   }
 
   public Collection getInheritedGroupObjects() {
-    return null;
+    return realParent.getInheritedGroupObjects();
   }
 
   public AccessMode getInheritedAccess() {
-    return null;
+    return realParent.getInheritedAccess();
   }
 
   public Time getReleaseDate() {
-    return null;
+    return realParent.getReleaseDate();
   }
 
   public Time getRetractDate() {
-    return null;
+    return realParent.getRetractDate();
   }
 
   public boolean isHidden() {
@@ -143,31 +152,31 @@ public abstract class ContentEntityFedora implements ContentEntity {
   }
 
   public boolean isAvailable() {
-    return false;
+    return true;
   }
 
   public String getUrl() {
-    return null;
+    return realParent.getUrl();
   }
 
   public String getUrl(boolean b) {
-    return null;
+    return realParent.getUrl(b);
   }
 
   public String getReference() {
-    return null;
+    return realParent.getReference();
   }
 
   public String getUrl(String rootProperty) {
-    return null;
+    return realParent.getUrl(rootProperty);
   }
 
   public String getReference(String rootProperty) {
-    return null;
+    return realParent.getReference(rootProperty);
   }
 
   public String getId() {
-    return null;
+    return realParent.getId();
   }
 
   public ResourceProperties getProperties() {
