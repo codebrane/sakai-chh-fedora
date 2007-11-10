@@ -21,13 +21,13 @@
 
 package org.sakaiproject.content.chh.fedora;
 
+import info.fedora.definitions.x1.x0.types.ObjectFields;
 import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.time.api.Time;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import info.fedora.definitions.x1.x0.types.ObjectFields;
 
 /**
 * <p>ContentCollection is the core interface for a Collection object in the GenericContentHostingService.</p>
@@ -38,6 +38,12 @@ import info.fedora.definitions.x1.x0.types.ObjectFields;
 */
 public class ContentCollectionFedora extends ContentEntityFedora implements ContentCollection {
   public ContentCollectionFedora(ContentEntity realParent, ObjectFields[] fields) {
+    this.realParent = realParent;
+    this.fields = fields;
+  }
+
+  public boolean isCollection() {
+    return true;
   }
 
   /**
@@ -45,7 +51,17 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	* @return a List of the collection's internal members, each a resource id String (may be empty).
 	*/
 	public List getMembers() {
-		return null;
+    if ((fields == null) || (fields.length == 0)) {
+      return new ArrayList(0);
+    }
+
+    List<String> members = new ArrayList<String>(fields.length);
+    
+    for (ObjectFields field : fields) {
+      members.add(realParent.getId() + field.getTitleArray(0));
+    }
+    
+    return members;
   }
 
 	/**
@@ -72,7 +88,7 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	 * @return
 	 */
 	public int getMemberCount() {
-		return -1;
+		return fields.length;
 	}
 	
 	/**
