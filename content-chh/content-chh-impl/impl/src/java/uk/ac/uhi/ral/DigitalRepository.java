@@ -26,5 +26,5 @@ public interface DigitalRepository {
   public void modifyObject();
   public void deleteObject();
   public void search();
-  public ContentEntity list();
+  public ContentEntity list(ContentEntity realParent);
 }
