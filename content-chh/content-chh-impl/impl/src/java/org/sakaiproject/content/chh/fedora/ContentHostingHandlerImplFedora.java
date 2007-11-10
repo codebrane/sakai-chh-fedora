@@ -172,6 +172,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * with the newly proxied ContentEntity so that subsequent invocations are routed back to the correct ContentHostingHandler implementation
 	 * 
 	 * @param edit
+   * @param finalId /public/Fedora/fedora-mountpoint.txt/
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
@@ -182,7 +183,9 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
       SessionManager.getCurrentSession().getUserEid();
 
       DigitalRepository repo = repoFactory.create();
-      repo.init(config);
+      repo.init(config, contentHostingHandlerResolver, this);
+
+      return repo.list();
     }
     catch(IOException ioe) {
       log.error("Can't load fedora config", ioe);
