@@ -70,7 +70,7 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * 
 	 * @return
 	 */
-	public ContentHostingHandlerImplFedora getContentHandler() {
+	public ContentHostingHandler getContentHandler() {
 		return new ContentHostingHandlerImplFedora();
 	}
 	
