@@ -185,7 +185,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
       DigitalRepository repo = repoFactory.create();
       repo.init(config, contentHostingHandlerResolver, this);
 
-      return repo.list();
+      return repo.list(edit);
     }
     catch(IOException ioe) {
       log.error("Can't load fedora config", ioe);
