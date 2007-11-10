@@ -10,19 +10,20 @@ import info.fedora.definitions.x1.x0.types.*;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.commons.httpclient.protocol.Protocol;
-import org.sakaiproject.content.api.ContentEntity;
-import org.sakaiproject.content.api.ContentHostingHandlerResolver;
-import org.sakaiproject.content.api.ContentHostingHandler;
 import org.guanxi.common.EntityConnection;
+import org.sakaiproject.content.api.ContentEntity;
+import org.sakaiproject.content.api.ContentHostingHandler;
+import org.sakaiproject.content.api.ContentHostingHandlerResolver;
+import org.sakaiproject.content.chh.fedora.ContentCollectionFedora;
 import uk.ac.uhi.ral.DigitalRepository;
 
-import java.math.BigInteger;
-import java.rmi.RemoteException;
-import java.util.PropertyResourceBundle;
-import java.security.cert.X509Certificate;
-import java.security.KeyStore;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.math.BigInteger;
+import java.rmi.RemoteException;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+import java.util.PropertyResourceBundle;
 
 public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   /** Connection information. This comes from the mountpoint XML file */
@@ -142,6 +143,8 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       FindObjectsResponseDocument outDoc = stub.findObjects(doc);
 
       ObjectFields[] fields = outDoc.getFindObjectsResponse().getResult().getResultList().getObjectFieldsArray();
+
+      ContentCollectionFedora collection = new ContentCollectionFedora();
 
       for (ObjectFields field : fields) {
         contentHostingHandlerResolver.newResourceEdit(field.getPid());
