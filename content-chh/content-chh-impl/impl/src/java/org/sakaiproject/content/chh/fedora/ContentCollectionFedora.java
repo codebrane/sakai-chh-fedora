@@ -21,10 +21,14 @@
 
 package org.sakaiproject.content.chh.fedora;
 
-import info.fedora.definitions.x1.x0.types.ObjectFields;
-import org.sakaiproject.content.api.ContentCollection;
-import org.sakaiproject.content.api.ContentEntity;
-import org.sakaiproject.time.api.Time;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.content.api.*;
+import org.sakaiproject.entity.api.Edit;
+import org.sakaiproject.entity.api.ResourceProperties;
+import uk.ac.uhi.ral.DigitalItemInfo;
+import uk.ac.uhi.ral.DigitalRepository;
+import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +41,41 @@ import java.util.List;
 * @version $Revision: 19673 $
 */
 public class ContentCollectionFedora extends ContentEntityFedora implements ContentCollection {
-  public ContentCollectionFedora(ContentEntity realParent, ObjectFields[] fields) {
-    this.realParent = realParent;
-    this.fields = fields;
+  private static final String LOG_MARKER = "[CTREP:ContentCollectionFedora] ";
+
+  private static final Log log = LogFactory.getLog(ContentCollectionFedora.class);
+
+  public ContentCollectionFedora(ContentEntity realParent, String relativePath,
+                                 ContentHostingHandler chh,
+                                 ContentHostingHandlerResolver chhResolver,
+                                 DigitalRepository repo,
+                                 DigitalItemInfo item) {
+    super(realParent, relativePath, chh, chhResolver, repo, item);
+  }
+
+  public Edit wrap() {
+    if (wrapped == null) {
+      wrapped = chhResolver.newCollectionEdit(join(realParent.getId(), relativePath));
+      ((ContentEntity)wrapped).setContentHandler(chh);
+      ((ContentEntity)wrapped).setVirtualContentEntity(this);
+      ((GroupAwareEdit)wrapped).setResourceType(this.getResourceType());
+      wrapped.getProperties().addAll(((Edit)realParent).getProperties());
+      wrapped.getProperties().removeProperty(ContentHostingHandlerResolver.CHH_BEAN_NAME);
+      setVirtualProperties();
+    }
+
+    return wrapped;
+  }
+
+  protected void setVirtualProperties() {
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_DISPLAY_NAME, item.getDisplayName());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_CREATOR, item.getCreator());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_MODIFIED_DATE, item.getModifiedDate());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_ORIGINAL_FILENAME, relativePath);
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_DESCRIPTION, item.getDescription());
+
+    // collection-only properties
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_IS_COLLECTION, Boolean.TRUE.toString());
   }
 
   public boolean isCollection() {
@@ -51,26 +87,40 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	* @return a List of the collection's internal members, each a resource id String (may be empty).
 	*/
 	public List getMembers() {
-    if ((fields == null) || (fields.length == 0)) {
-      return new ArrayList(0);
-    }
+    // do the fedora ws search here - but from which repo?
+    log.info(LOG_MARKER + "getMembers");
 
-    List<String> members = new ArrayList<String>(fields.length);
-    
-    for (ObjectFields field : fields) {
-      members.add(realParent.getId() + field.getTitleArray(0));
+    DigitalItemInfo[] items = repo.list();
+
+    List<String> members = new ArrayList<String>(items.length);
+    for (DigitalItemInfo item : items) {
+      members.add(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
     }
     
     return members;
   }
 
-	/**
+  /**
 	* Access a List of the collections' internal members as full ContentResource or
 	* ContentCollection objects.
 	* @return a List of the full objects of the members of the collection.
 	*/
 	public List getMemberResources() {
-		return null;
+    log.info(LOG_MARKER + "getMemberResources");
+
+    List members = getMembers();
+
+    List<Edit> resources = new ArrayList<Edit>(members.size());
+
+    for (Object obj : members) {
+      String pid = (String)obj;
+      ContentEntity ce = getMember(pid);
+      if (ce instanceof ContentResource) {
+        resources.add(((ContentResourceFedora)ce).wrap());
+      }
+    }
+
+    return resources;
 	}
 
 	/**
@@ -78,7 +128,8 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	* @return The size of all the resource body bytes within this collection in Kbytes.
 	*/
 	public long getBodySizeK() {
-		return -1;
+    log.info(LOG_MARKER + "getBodySizeK");
+    return -1;
 	}
 	
 	/**
@@ -88,26 +139,13 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	 * @return
 	 */
 	public int getMemberCount() {
-		return fields.length;
+    log.info(LOG_MARKER + "getMemberCount : returning " + getMembers().size());
+    return getMembers().size();
 	}
 	
-	/**
-	 * Access the release date before which this entity should not be available to users 
-	 * except those with adequate permission (what defines "adequate permission" is TBD).
-	 * @return The date/time at which the entity may be accessed by all users.
-	 */
-	public Time getReleaseDate() {
-		return null;
-	}
-	
-	/**
-	 * Access the retract date after which this entity should not be available to users 
-	 * except those with adequate permission (what defines "adequate permission" is TBD).
-	 * @return The date/time at which access to the entity should be restricted.
-	 */
-	public Time getRetractDate() {
-		return null;
-	}
+  public String getResourceType() {
+    return ResourceType.TYPE_FOLDER;
+  }
 
 }
 
