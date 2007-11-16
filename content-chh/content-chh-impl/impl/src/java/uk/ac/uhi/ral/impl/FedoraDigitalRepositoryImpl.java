@@ -11,11 +11,9 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.guanxi.common.EntityConnection;
-import org.sakaiproject.content.api.ContentEntity;
-import org.sakaiproject.content.api.ContentHostingHandler;
-import org.sakaiproject.content.api.ContentHostingHandlerResolver;
-import org.sakaiproject.content.chh.fedora.ContentCollectionFedora;
+import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
+import uk.ac.uhi.ral.impl.util.TypeMapper;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,10 +36,6 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   private HttpTransportProperties.Authenticator authenticator = null;
   /** Our custom protocol handler which supports SSL probing */
   private Protocol customProtocolHandler = null;
-  /** The Sakai content hosting resolver */
-  private ContentHostingHandlerResolver contentHostingHandlerResolver = null;
-  /** The ContentHostingHandler to use */
-  ContentHostingHandler chh = null;
 
   public FedoraDigitalRepositoryImpl(String keystorePath, String keystorePassword,
                                      String truststorePath, String truststorePassword) {
@@ -51,13 +45,9 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     this.truststorePassword = truststorePassword;
   }
 
-  public void init(PropertyResourceBundle repoConfig,
-                   ContentHostingHandlerResolver contentHostingHandlerResolver,
-                   ContentHostingHandler chh) {
+  public void init(PropertyResourceBundle repoConfig) {
     this.repoConfig = repoConfig;
-    this.contentHostingHandlerResolver = contentHostingHandlerResolver;
-    this.chh = chh;
-    
+
     // Prepare the authentication details for a web service request, i.e. fedora admin username and password
     authenticator = new HttpTransportProperties.Authenticator();
     authenticator.setUsername(repoConfig.getString(CONFIG_KEY_CONNECTION_USERNAME));
@@ -98,7 +88,15 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   public void deleteObject() {}
   public void search() {}
 
-  public ContentEntity list(ContentEntity realParent) {
+  public DigitalItemInfo[] list() {
+    return queryFedora(null);
+  }
+
+  public DigitalItemInfo list(String id) {
+    return queryFedora(id)[0];
+  }
+
+  private DigitalItemInfo[] queryFedora(String pid) {
     // Build a new request document
     FindObjectsDocument doc = FindObjectsDocument.Factory.newInstance();
 
@@ -108,8 +106,14 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     FieldSearchQuery.Conditions conditions = query.addNewConditions();
     Condition condition = conditions.addNewCondition();
     condition.setProperty("pid");
-    condition.setOperator(ComparisonOperator.HAS);
-    condition.setValue("*");
+    if (pid == null) {
+      condition.setOperator(ComparisonOperator.HAS);
+      condition.setValue("*");
+    }
+    else {
+      condition.setOperator(ComparisonOperator.EQ);
+      condition.setValue(pid);
+    }
 
     // http://www.fedora.info/definitions/1/0/types/#complexType_ObjectFields_Link03247988
     ArrayOfString resultFields = params.addNewResultFields();
@@ -128,8 +132,6 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     //params.setMaxResults(null);
     params.setMaxResults(new BigInteger("999999999")); // null = no limit on results
 
-    ContentCollectionFedora collection = null;
-    
     try {
       // Initiate the client connection to the API-A endpoint
       FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repoConfig.getString(CONFIG_KEY_API_A_ENDPOINT));
@@ -144,12 +146,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
       ObjectFields[] fields = outDoc.getFindObjectsResponse().getResult().getResultList().getObjectFieldsArray();
 
-      collection = new ContentCollectionFedora(realParent, fields);
-
-      collection.setContentHandler(chh);
-      //ce.setVirtualContentEntity(this);
-
-      return collection;
+      return TypeMapper.toDigitalItemInfo(fields);
     }
     catch(RemoteException re) {
       return null;
