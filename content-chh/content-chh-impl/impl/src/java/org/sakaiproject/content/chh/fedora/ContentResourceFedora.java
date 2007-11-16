@@ -21,16 +21,63 @@
 
 package org.sakaiproject.content.chh.fedora;
 
-import java.io.InputStream;
-
-import org.sakaiproject.content.api.ContentResource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.content.api.*;
+import org.sakaiproject.entity.api.Edit;
+import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.exception.ServerOverloadException;
+import uk.ac.uhi.ral.DigitalItemInfo;
+import uk.ac.uhi.ral.DigitalRepository;
+import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
+
+import java.io.InputStream;
 
 /**
 * <p>ContentResource is the core interface for a Resource object in the GenericContentHostingService.</p>
 */
 public class ContentResourceFedora extends ContentEntityFedora implements ContentResource {
-	/**
+  private static final Log log = LogFactory.getLog(ContentCollectionFedora.class);
+
+  public ContentResourceFedora(ContentEntity realParent, String relativePath,
+                               ContentHostingHandler chh,
+                               ContentHostingHandlerResolver chhResolver,
+                               DigitalRepository repo,
+                               DigitalItemInfo item) {
+    super(realParent, relativePath, chh, chhResolver, repo, item);
+  }
+  
+  public Edit wrap() {
+    if (wrapped == null) {
+      wrapped = chhResolver.newResourceEdit(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      ((ContentEntity)wrapped).setContentHandler(chh);
+      ((ContentEntity)wrapped).setVirtualContentEntity(this);
+
+      // set the resource type
+      ((GroupAwareEdit)wrapped).setResourceType(this.getResourceType());
+
+      // copy properties from real parent, then overwrite specific properties
+      wrapped.getProperties().addAll(((Edit)realParent).getProperties());
+      wrapped.getProperties().removeProperty(ContentHostingHandlerResolver.CHH_BEAN_NAME);
+      setVirtualProperties();
+    }
+
+    return wrapped;
+  }
+
+  protected void setVirtualProperties() {
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_DISPLAY_NAME, item.getDisplayName());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_CREATOR, item.getCreator());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_MODIFIED_DATE, item.getCreator());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_ORIGINAL_FILENAME, item.getOriginalFilename());
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_DESCRIPTION, item.getDescription());
+
+    // resource-only properties
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_CONTENT_LENGTH, String.valueOf(item.getContentLength()));
+    wrapped.getProperties().addProperty(ResourceProperties.PROP_IS_COLLECTION, Boolean.FALSE.toString());
+  }
+
+  /**
 	* Access the content byte length.
 	* @return The content byte length.
 	*/
@@ -66,7 +113,14 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	public InputStream streamContent() throws ServerOverloadException {
 		return null;
 	}
-	
+
+  public String getResourceType() {
+    return ResourceType.TYPE_UPLOAD;
+  }
+
+  public boolean isResource() {
+    return true;
+  }
 }
 
 
