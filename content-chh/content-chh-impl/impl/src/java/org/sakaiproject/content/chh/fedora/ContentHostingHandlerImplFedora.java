@@ -6,14 +6,19 @@ package org.sakaiproject.content.chh.fedora;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.content.api.*;
+import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
+import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
+import uk.ac.uhi.ral.impl.FedoraItemInfo;
+import uk.ac.uhi.ral.impl.util.TypeResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.PropertyResourceBundle;
@@ -24,6 +29,8 @@ import java.util.PropertyResourceBundle;
  * @author Alistair Young alistairskye@googlemail.com
  */
 public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
+  private static final String LOG_MARKER = "[CTREP:ContentHostingHandlerImplFedora] ";
+  
   /** Our logger */
   private static final Log log = LogFactory.getLog(ContentHostingHandlerImplFedora.class);
 
@@ -113,7 +120,32 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public List getCollections(ContentCollection collection) {
-		return null;
+    log.info(LOG_MARKER + "getCollections : getId = " + collection.getId());
+    
+    ContentEntity cc = collection.getVirtualContentEntity();
+
+    if (!(cc instanceof ContentCollectionFedora)) {
+      return null;
+    }
+
+    ContentCollectionFedora fedoraCollection = (ContentCollectionFedora)cc;
+    List l = fedoraCollection.getMembers();
+    //ArrayList<Edit> collections = new ArrayList<Edit>(l.size());
+    ArrayList<Edit> collections = new ArrayList<Edit>(0);
+
+    /*
+    for (Iterator i = l.listIterator(); i.hasNext();) {
+      String id = (String)i.next();
+
+      ContentEntityFedora ceds = resolveDSpace(ccds.realParent, ccds.endpoint,
+      ccds.basehandle, id.substring(ccds.realParent.getId().length() + 1),
+      this, ccds.searchable);
+      
+      if (ceds instanceof ContentCollectionDSpace) collections.add(ceds.wrap());
+    }
+    */
+
+    return collections;
 	}
 
 	/**
@@ -123,7 +155,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentCollectionEdit getContentCollectionEdit(String id) {
-		return null;
+    log.info(LOG_MARKER + "getContentCollectionEdit : id = " + id);
+    return null;
 	}
 
 	/**
@@ -133,7 +166,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentResourceEdit getContentResourceEdit(String id) {
-		return null;
+    log.info(LOG_MARKER + "getContentResourceEdit : id = " + id);
+    return null;
 	}
 
 	/**
@@ -143,7 +177,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public List getFlatResources(ContentEntity ce) {
-		return null;
+    log.info(LOG_MARKER + "getFlatResources : id = " + ce.getId());
+    return null;
 	}
 
 	/**
@@ -154,7 +189,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @throws ServerOverloadException
 	 */
 	public byte[] getResourceBody(ContentResource resource) throws ServerOverloadException {
-		return null;
+    log.info(LOG_MARKER + "getResourceBody : id = " + resource.getId());
+    return null;
 	}
 
 	/**
@@ -164,7 +200,16 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public List getResources(ContentCollection collection) {
-		return null;
+    log.info(LOG_MARKER + "getResources : id = " + collection.getId());
+
+    ContentEntity cc = collection.getVirtualContentEntity();
+
+    if (!(cc instanceof ContentCollectionFedora)) {
+      return null;
+    }
+
+    ContentCollectionFedora fedoraCollection = (ContentCollectionFedora)cc;
+    return fedoraCollection.getMemberResources();
 	}
 
 	/**
@@ -176,16 +221,30 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity(ContentEntity edit, String finalId) {
+    log.info(LOG_MARKER + "getVirtualContentEntity : id = " + edit.getId() + " finalId = " + finalId);
+
     try {
-      // The content of the resource is XML defining the Fedora connection properties
+      // Get the resource content
       PropertyResourceBundle config = new PropertyResourceBundle(new ByteArrayInputStream(((ContentResource)edit).getContent()));
 
       SessionManager.getCurrentSession().getUserEid();
 
       DigitalRepository repo = repoFactory.create();
-      repo.init(config, contentHostingHandlerResolver, this);
 
-      return repo.list(edit);
+      repo.init(config);
+
+      //ThreadLocalManager.set("FEDORA" + edit.getId(), repo);
+
+      DigitalItemInfo item = new FedoraItemInfo();
+      item.setDescription("TEST");
+      item.setCreator("TEST");
+      item.setDisplayName("TEST");
+      item.setModifiedDate("TEST");
+      item.setDisplayName("TEST");
+
+      ContentEntityFedora entity = (ContentEntityFedora)TypeResolver.resolveEntity(edit, finalId.substring(edit.getId().length()), this,
+                                                                                   contentHostingHandlerResolver, repo, item);
+      return (ContentEntity)entity.wrap();
     }
     catch(IOException ioe) {
       log.error("Can't load fedora config", ioe);
@@ -206,7 +265,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentResourceEdit putDeleteResource(String id, String uuid, String userId) {
-		return null;
+    return null;
 	}
 
 	/**
@@ -233,7 +292,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @throws ServerOverloadException
 	 */
 	public InputStream streamResourceBody(ContentResource resource) throws ServerOverloadException {
-		return null;
+    log.info(LOG_MARKER + "streamResourceBody : id = " + resource.getId());
+    return null;
 	}
 
 	/**
@@ -242,15 +302,24 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public int getMemberCount(ContentEntity ce) {
-		return -1;
-	}
+    log.info(LOG_MARKER + "getMemberCount : id = " + ce.getId());
+
+    if (ce instanceof ContentCollectionFedora)
+      return ((ContentCollectionFedora)ce).getMemberCount();
+
+    if (ce.getVirtualContentEntity() instanceof ContentCollectionFedora)
+      return ((ContentCollectionFedora)(ce.getVirtualContentEntity())).getMemberCount();
+    
+    return 0;
+  }
 
 	/**
 	 * @param ce
 	 * @return
 	 */
 	public Collection<String> getMemberCollectionIds(ContentEntity ce) {
-		return null;
+    log.info(LOG_MARKER + "getMemberCollectionIds : id = " + ce.getId());
+    return null;
 	}
 
 	/**
@@ -258,7 +327,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public Collection<String> getMemberResourceIds(ContentEntity ce) {
-		return null;
+    log.info(LOG_MARKER + "getMemberResourceIds : id = " + ce.getId());
+    return null;
 	}
 
 	/**
@@ -285,7 +355,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	 public void setResourceUuid(String resourceId, String uuid) {
-	 }
+    log.info(LOG_MARKER + "setResourceUuid : resourceId = " + resourceId + " uuid = " + uuid);
+   }
 
 	/**
 	 * @param id
