@@ -21,10 +21,11 @@ public interface DigitalRepository {
   /** The password for the connection */
   public static final String CONFIG_KEY_CONNECTION_PASSWORD = "connection.password";
 
-  public void init(PropertyResourceBundle config, ContentHostingHandlerResolver contentHostingHandlerResolver, ContentHostingHandler chh);
+  public void init(PropertyResourceBundle config);
   public void createObject();
   public void modifyObject();
   public void deleteObject();
   public void search();
-  public ContentEntity list(ContentEntity realParent);
+  public DigitalItemInfo[] list();
+  public DigitalItemInfo list(String id);
 }
