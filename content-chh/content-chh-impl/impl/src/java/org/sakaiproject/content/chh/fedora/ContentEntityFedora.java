@@ -21,24 +21,64 @@
 
 package org.sakaiproject.content.chh.fedora;
 
-import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentCollection;
+import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingHandler;
-import org.sakaiproject.time.api.Time;
+import org.sakaiproject.content.api.ContentHostingHandlerResolver;
+import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.w3c.dom.Element;
+import org.sakaiproject.time.api.Time;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.Collection;
 import java.util.Stack;
 
-import info.fedora.definitions.x1.x0.types.ObjectFields;
+import uk.ac.uhi.ral.DigitalRepository;
+import uk.ac.uhi.ral.DigitalItemInfo;
+import uk.ac.uhi.ral.impl.util.TypeResolver;
 
 public abstract class ContentEntityFedora implements ContentEntity {
+  protected String relativePath = null;
+  protected DigitalRepository repo = null;
+  protected ContentHostingHandlerResolver chhResolver = null;
+  protected Edit wrapped = null;
   protected ContentHostingHandler chh = null;
   protected ContentEntity ce = null;
   protected ContentEntity realParent = null;
-  protected ObjectFields[] fields = null;
+  protected DigitalItemInfo item = null;
+
+  public ContentEntityFedora(ContentEntity realParent, String relativePath,
+                             ContentHostingHandler chh,
+                             ContentHostingHandlerResolver chhResolver,
+                             DigitalRepository repo,
+                             DigitalItemInfo item) {
+    this.realParent = realParent;
+    this.relativePath = relativePath;
+    this.chh = chh;
+    this.chhResolver = chhResolver;
+    this.repo = repo;
+    this.item = item;
+  }
+
+  abstract public Edit wrap();
+  abstract protected void setVirtualProperties();
+
+  protected String join(String base, String extension) {
+    while (base.length() > 0 && base.charAt(base.length() - 1) == '/')
+      base = base.substring(0, base.length() - 1);
+    while (extension.length() > 0 && extension.charAt(0) == '/')
+      extension = extension.substring(1);
+    return base + "/" + extension;
+  }
+
+  public void setRepository(DigitalRepository repository) {
+    this.repo = repository;
+  }
+
+  public DigitalRepository getRepository() {
+    return repo;
+  }
 
   /**
 	 * Access this ContentEntity's containing collection, or null if this entity is the site collection.
@@ -107,12 +147,12 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	
 	/**
 	 * 
-	 * @param nextId
+	 * @param nextId The pid
 	 * @return
 	 */
 	public ContentEntity getMember(String nextId) {
-		return null;
-	}
+    return TypeResolver.resolveEntity(realParent, nextId, chh, chhResolver, repo, repo.list(nextId));
+  }
 	
   /* Junk required by GroupAwareEntity superinterface */
   public Collection getGroups() {
@@ -156,36 +196,34 @@ public abstract class ContentEntityFedora implements ContentEntity {
   }
 
   public String getUrl() {
-    return realParent.getUrl();
+    return join(realParent.getUrl(), relativePath);
   }
 
   public String getUrl(boolean b) {
-    return realParent.getUrl(b);
+    return join(realParent.getUrl(b), relativePath);
   }
 
   public String getReference() {
-    return realParent.getReference();
+    return join(realParent.getReference(), relativePath);
   }
 
   public String getUrl(String rootProperty) {
-    return realParent.getUrl(rootProperty);
+    return join(realParent.getUrl(rootProperty), relativePath);
   }
 
   public String getReference(String rootProperty) {
-    return realParent.getReference(rootProperty);
+    return join(realParent.getReference(rootProperty), relativePath);
   }
 
   public String getId() {
-    return realParent.getId();
+    return join(realParent.getId(), relativePath);
   }
 
   public ResourceProperties getProperties() {
-    return null;
+    return realParent.getProperties();
   }
 
   public Element toXml(Document doc, Stack stack) {
-    return null;
+    return realParent.toXml(doc, stack);
   }
-
-
 }
