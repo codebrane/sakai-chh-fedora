@@ -45,6 +45,14 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     this.truststorePassword = truststorePassword;
   }
 
+  public PropertyResourceBundle getRepoConfig() {
+    return repoConfig;
+  }
+
+  public DigitalItemInfo generateItem() {
+    return new FedoraItemInfo();
+  }
+
   public void init(PropertyResourceBundle repoConfig) {
     this.repoConfig = repoConfig;
 
