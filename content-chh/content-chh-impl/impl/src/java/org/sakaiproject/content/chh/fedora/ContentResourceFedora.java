@@ -32,6 +32,8 @@ import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
 * <p>ContentResource is the core interface for a Resource object in the GenericContentHostingService.</p>
@@ -49,7 +51,8 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
   
   public Edit wrap() {
     if (wrapped == null) {
-      wrapped = chhResolver.newResourceEdit(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      //wrapped = chhResolver.newResourceEdit(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      wrapped = chhResolver.newResourceEdit(getId());
       ((ContentEntity)wrapped).setContentHandler(chh);
       ((ContentEntity)wrapped).setVirtualContentEntity(this);
 
@@ -66,6 +69,20 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
   }
 
   protected void setVirtualProperties() {
+    String tmp;
+    if (this.relativePath.equals("/"))
+      tmp = ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid();
+    else {
+      int lastSlash = this.relativePath.lastIndexOf("/", this.relativePath
+          .length() - 2);
+      // if there are no slashes, the display name should be the whole
+      // relative path
+      if (lastSlash == -1)
+        tmp = this.relativePath;
+      else
+        tmp = this.relativePath.substring(lastSlash).substring(1);
+    }
+
     wrapped.getProperties().addProperty(ResourceProperties.PROP_DISPLAY_NAME, item.getDisplayName());
     wrapped.getProperties().addProperty(ResourceProperties.PROP_CREATOR, item.getCreator());
     wrapped.getProperties().addProperty(ResourceProperties.PROP_MODIFIED_DATE, item.getCreator());
@@ -82,7 +99,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* @return The content byte length.
 	*/
 	public int getContentLength() {
-		return -1;
+		return 666;
 	}
 
 	/**
@@ -90,7 +107,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* @return The resource MIME type.
 	*/
 	public String getContentType() {
-		return null;
+		return "application/pdf";
 	}
 
 	/**
@@ -111,8 +128,13 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	 * @throws ServerOverloadException if the server cannot produce the content stream at this time.
 	 */
 	public InputStream streamContent() throws ServerOverloadException {
-		return null;
-	}
+    try {
+      return new URL("https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:001/PDF").openStream();
+    }
+    catch(Exception e) {
+      return null;
+    }
+  }
 
   public String getResourceType() {
     return ResourceType.TYPE_UPLOAD;
@@ -120,6 +142,10 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 
   public boolean isResource() {
     return true;
+  }
+
+  public boolean isCollection() {
+    return false;
   }
 }
 
