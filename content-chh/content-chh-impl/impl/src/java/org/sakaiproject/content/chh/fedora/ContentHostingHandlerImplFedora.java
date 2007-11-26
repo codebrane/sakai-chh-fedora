@@ -9,10 +9,8 @@ import org.sakaiproject.content.api.*;
 import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
-import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
-import uk.ac.uhi.ral.impl.FedoraItemInfo;
 import uk.ac.uhi.ral.impl.util.TypeResolver;
 
 import java.io.ByteArrayInputStream;

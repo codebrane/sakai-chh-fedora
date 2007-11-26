@@ -32,7 +32,6 @@ import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
