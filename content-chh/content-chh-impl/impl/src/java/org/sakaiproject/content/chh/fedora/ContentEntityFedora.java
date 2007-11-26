@@ -40,11 +40,12 @@ import uk.ac.uhi.ral.impl.util.TypeResolver;
 
 public abstract class ContentEntityFedora implements ContentEntity {
   protected String relativePath = null;
+  protected String parentRelativePath = null;
   protected DigitalRepository repo = null;
   protected ContentHostingHandlerResolver chhResolver = null;
   protected Edit wrapped = null;
   protected ContentHostingHandler chh = null;
-  protected ContentEntity ce = null;
+  //protected ContentEntity ce = null;
   protected ContentEntity realParent = null;
   protected DigitalItemInfo item = null;
 
@@ -59,6 +60,24 @@ public abstract class ContentEntityFedora implements ContentEntity {
     this.chhResolver = chhResolver;
     this.repo = repo;
     this.item = item;
+
+    int lastSlash = relativePath.lastIndexOf('/');
+    if (relativePath.lastIndexOf('/') < 1) {
+      /*
+       * PROBLEM: getContainingCollection must return a Collection but
+       * what do we want to return when you recurse out of the top of the
+       * virtual object tree? We can't return the realParent since that is
+       * not a Collection. One choice is to make the root of the virtual
+       * tree a parent of itself, and that is what we do. Other than
+       * changing the return type of getContainingCollection there is no
+       * nice solution to this problem.
+       */
+      this.parentRelativePath = "/"; // root cyclically parents
+      // itself :-S
+    }
+    else {
+      this.parentRelativePath = relativePath.substring(0, lastSlash);
+    }
   }
 
   abstract public Edit wrap();
@@ -92,18 +111,14 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * Check whether an entity is a ContentResource.
 	 * @return true if the entity implements the ContentResource interface, false otherwise.
 	 */
-	public boolean isResource() {
-		return false;
-	}
-	
-	/**
+	abstract public boolean isResource();
+  
+  /**
 	 * Check whether an entity is a ContentCollection.
 	 * @return true if the entity implements the ContentCollection interface, false otherwise.
 	 */
-	public boolean isCollection() {
-		return false;
-	}
-	
+	abstract public boolean isCollection();
+
 	/**
 	 * Access the "type" of this ContentEntity, which defines which ResourceType registration defines
 	 * its properties.
@@ -134,15 +149,14 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public ContentEntity getVirtualContentEntity() {
-		return ce;
+		return this;
 	}
 	
 	/**
-	 * 
+	 * method is used by BaseResourceEdit, not really useful here
 	 * @param ce
 	 */
 	public void setVirtualContentEntity(ContentEntity ce) {
-    this.ce = ce;
   }
 	
 	/**
@@ -151,7 +165,8 @@ public abstract class ContentEntityFedora implements ContentEntity {
 	 * @return
 	 */
 	public ContentEntity getMember(String nextId) {
-    return TypeResolver.resolveEntity(realParent, nextId, chh, chhResolver, repo, repo.list(nextId));
+    //String newpath = nextId.substring(realParent.getId().length());
+    return TypeResolver.resolveEntity(realParent, nextId, chh, chhResolver, repo);
   }
 	
   /* Junk required by GroupAwareEntity superinterface */
@@ -188,11 +203,11 @@ public abstract class ContentEntityFedora implements ContentEntity {
   }
 
   public boolean isHidden() {
-    return false;
+    return realParent.isHidden();
   }
 
   public boolean isAvailable() {
-    return true;
+    return realParent.isAvailable();
   }
 
   public String getUrl() {
