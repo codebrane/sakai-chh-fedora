@@ -50,7 +50,8 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
                                  ContentHostingHandlerResolver chhResolver,
                                  DigitalRepository repo,
                                  DigitalItemInfo item) {
-    super(realParent, relativePath, chh, chhResolver, repo, item);
+    super(realParent, (relativePath.length() == 0 || relativePath.charAt(relativePath
+						.length() - 1) != '/') ? relativePath + "/" : relativePath, chh, chhResolver, repo, item);
   }
 
   public Edit wrap() {
@@ -76,6 +77,10 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 
     // collection-only properties
     wrapped.getProperties().addProperty(ResourceProperties.PROP_IS_COLLECTION, Boolean.TRUE.toString());
+  }
+
+  public boolean isResource() {
+    return false;
   }
 
   public boolean isCollection() {
