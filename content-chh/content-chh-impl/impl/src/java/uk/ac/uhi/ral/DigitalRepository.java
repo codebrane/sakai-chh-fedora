@@ -5,10 +5,6 @@
 
 package uk.ac.uhi.ral;
 
-import org.sakaiproject.content.api.ContentEntity;
-import org.sakaiproject.content.api.ContentHostingHandlerResolver;
-import org.sakaiproject.content.api.ContentHostingHandler;
-
 import java.util.PropertyResourceBundle;
 
 public interface DigitalRepository {
@@ -21,11 +17,13 @@ public interface DigitalRepository {
   /** The password for the connection */
   public static final String CONFIG_KEY_CONNECTION_PASSWORD = "connection.password";
 
+  public PropertyResourceBundle getRepoConfig();
   public void init(PropertyResourceBundle config);
   public void createObject();
   public void modifyObject();
   public void deleteObject();
   public void search();
+  public DigitalItemInfo generateItem();
   public DigitalItemInfo[] list();
   public DigitalItemInfo list(String id);
 }
