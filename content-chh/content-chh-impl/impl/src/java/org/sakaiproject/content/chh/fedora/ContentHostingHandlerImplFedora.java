@@ -235,15 +235,17 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 
       //ThreadLocalManager.set("FEDORA" + edit.getId(), repo);
 
+      /*
       DigitalItemInfo item = new FedoraItemInfo();
       item.setDescription("TEST");
       item.setCreator("TEST");
       item.setDisplayName("TEST");
       item.setModifiedDate("TEST");
       item.setDisplayName("TEST");
+      */
 
       ContentEntityFedora entity = (ContentEntityFedora)TypeResolver.resolveEntity(edit, finalId.substring(edit.getId().length()), this,
-                                                                                   contentHostingHandlerResolver, repo, item);
+                                                                                   contentHostingHandlerResolver, repo);
       return (ContentEntity)entity.wrap();
     }
     catch(IOException ioe) {
@@ -293,7 +295,11 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 */
 	public InputStream streamResourceBody(ContentResource resource) throws ServerOverloadException {
     log.info(LOG_MARKER + "streamResourceBody : id = " + resource.getId());
-    return null;
+
+    ContentEntity ce = resource.getVirtualContentEntity();
+    if (!(ce instanceof ContentResourceFedora)) return null;
+    ContentResourceFedora crfd = (ContentResourceFedora) ce;
+    return crfd.streamContent();
 	}
 
 	/**
