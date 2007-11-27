@@ -20,7 +20,7 @@ public interface DigitalRepository {
 
   public PropertyResourceBundle getRepoConfig();
   public void init(PropertyResourceBundle config);
-  public void createObject();
+  public boolean createObject(DigitalItemInfo item);
   public void modifyObject();
   public void deleteObject();
   public void search();
