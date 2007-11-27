@@ -46,6 +46,13 @@ public class TypeResolver {
     }
     else {
       item = repo.list(relativePath);
+
+      // New resource being uploaded?
+      if (item == null) {
+        item = repo.generateItem();
+      }
+
+      item.setIsCollection(false);
       item.setIsResource(true);
     }
 
