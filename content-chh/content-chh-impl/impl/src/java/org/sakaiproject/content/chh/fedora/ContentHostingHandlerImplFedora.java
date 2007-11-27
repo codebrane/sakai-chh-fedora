@@ -11,6 +11,7 @@ import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
+import uk.ac.uhi.ral.impl.util.TypeMapper;
 import uk.ac.uhi.ral.impl.util.TypeResolver;
 
 import java.io.ByteArrayInputStream;
@@ -76,7 +77,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 */
 	public void cancel(ContentCollectionEdit edit) {
-	}
+    log.info(LOG_MARKER + "cancel:ContentCollectionEdit");
+  }
 
 	/**
 	 * cancel an edit to a resource ( if this needs to be done )
@@ -84,7 +86,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 */
 	public void cancel(ContentResourceEdit edit) {
-	}
+    log.info(LOG_MARKER + "cancel:ContentResourceEdit");
+  }
 
 	/**
 	 * commit a collection
@@ -92,7 +95,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 */
 	public void commit(ContentCollectionEdit edit) {
-	}
+    log.info(LOG_MARKER + "commit:ContentCollectionEdit");
+  }
 
 	/**
 	 * commit a resource
@@ -100,7 +104,20 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 */
 	public void commit(ContentResourceEdit edit) {
-	}
+    log.info(LOG_MARKER + "commit:ContentResourceEdit");
+
+    ContentResourceFedora crFedora = null;
+    if (edit instanceof ContentResourceFedora)
+      crFedora = (ContentResourceFedora)edit;
+    else {
+      if (edit.getVirtualContentEntity() instanceof ContentResourceFedora) {
+        crFedora = (ContentResourceFedora)edit.getVirtualContentEntity();
+      }
+    }
+    if (crFedora == null) return;
+
+    crFedora.getRepository().createObject(TypeMapper.toDigitalItemInfo(edit));
+  }
 
 	/**
 	 * commit a deleted resource
@@ -109,7 +126,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param uuid
 	 */
 	public void commitDeleted(ContentResourceEdit edit, String uuid) {
-	}
+    log.info(LOG_MARKER + "commitDeleted");
+  }
 
 	/**
 	 * get a list of collections contained within the supplied collection
@@ -165,7 +183,9 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 */
 	public ContentResourceEdit getContentResourceEdit(String id) {
     log.info(LOG_MARKER + "getContentResourceEdit : id = " + id);
-    return null;
+    ContentResourceEdit cre = (ContentResourceEdit)contentHostingHandlerResolver.newResourceEdit(id);
+    cre.setContentHandler(this);
+    return cre;
 	}
 
 	/**
@@ -265,6 +285,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public ContentResourceEdit putDeleteResource(String id, String uuid, String userId) {
+    log.info(LOG_MARKER + "putDeleteResource");
     return null;
 	}
 
@@ -274,7 +295,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 */
 	public void removeCollection(ContentCollectionEdit edit) {
-	}
+    log.info(LOG_MARKER + "removeCollection");
+  }
 
 	/**
 	 * remove the resource
@@ -282,7 +304,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param edit
 	 */
 	public void removeResource(ContentResourceEdit edit) {
-	}
+    log.info(LOG_MARKER + "removeResource");
+  }
 
 	/**
 	 * stream the body of the resource
@@ -341,7 +364,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public String moveResource(ContentResourceEdit thisResource, String new_id) {
-		return null;
+    log.info(LOG_MARKER + "removeResource");
+    return null;
 	}
 
 	/**
@@ -350,7 +374,8 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @return
 	 */
 	public String moveCollection(ContentCollectionEdit thisCollection, String new_folder_id) {
-		return null;
+    log.info(LOG_MARKER + "moveCollection");
+    return null;
 	}
 
 	/**
@@ -366,6 +391,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 * @param id
 	 */
 	public void getUuid(String id) {
-	}
+    log.info(LOG_MARKER + "getUuid");
+  }
 
 }
