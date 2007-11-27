@@ -98,7 +98,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* @return The content byte length.
 	*/
 	public int getContentLength() {
-		return 666;
+		return 522250;
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	 */
 	public InputStream streamContent() throws ServerOverloadException {
     try {
-      return new URL("https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:001/PDF").openStream();
+      return repo.getContentAsStream("https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:001/PDF");
     }
     catch(Exception e) {
       return null;
