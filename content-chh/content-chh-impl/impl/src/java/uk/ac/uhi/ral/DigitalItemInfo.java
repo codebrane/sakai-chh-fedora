@@ -6,11 +6,45 @@
 package uk.ac.uhi.ral;
 
 public interface DigitalItemInfo {
-  public void setDisplayName(String displayName);
-  public String getDisplayName();
+  public void setTitle(String title);
+  public String getTitle();
 
   public void setCreator(String creator);
   public String getCreator();
+
+  public void setSubject(String subject);
+  public String getSubject();
+
+  public void setDescription(String description);
+  public String getDescription();
+
+  public void setPublisher(String publisher);
+  public String getPublisher();
+
+  public void setIdentifier(String identifier);
+  public String getIdentifier();
+
+  public void setMimeType(String mimeType);
+  public String getMimeType();
+
+  public void setBinaryContent(byte[] binaryContent);
+  public byte[] getBinaryContent();
+
+  public int getContentLength();
+
+  public void setIsResource(boolean resource);
+  public void setIsCollection(boolean collection);
+
+  public void setURL(String url);
+  public String getURL();
+
+  public boolean isResource();
+  public boolean isCollection();
+
+  // //////////////////
+  
+  public void setDisplayName(String displayName);
+  public String getDisplayName();
 
   public void setModifiedDate(String modifiedDate);
   public String getModifiedDate();
@@ -18,20 +52,10 @@ public interface DigitalItemInfo {
   public void setOriginalFilename(String originalFilename);
   public String getOriginalFilename();
 
-  public void setDescription(String description);
-  public String getDescription();
-
   public void setType(String type);
   public String getType();
 
-  public void setContentLength(long contentLength);
-  public long getContentLength();
-
-  public void setIsResource(boolean resource);
-  public void setIsCollection(boolean collection);
-
-  public boolean isResource();
-  public boolean isCollection();
+  // //////////////////
 
   public void setPrivateInfo(Object privateInfo);
   public Object getPrivateInfo();
