@@ -17,6 +17,7 @@ import uk.ac.uhi.ral.impl.util.TypeMapper;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.security.KeyStore;
@@ -102,6 +103,31 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
   public DigitalItemInfo list(String id) {
     return queryFedora(id)[0];
+  }
+
+  public InputStream getContentAsStream(String endpoint) {
+    try {
+      EntityConnection connection = new EntityConnection(endpoint,
+                                                         "test-keystore-alias",
+                                                         keystorePath, keystorePassword,
+                                                         truststorePath, truststorePassword,
+                                                         EntityConnection.PROBING_ON);
+      X509Certificate fedoraX509 = connection.getServerCertificate();
+      KeyStore fedoraTrustStore = KeyStore.getInstance("jks");
+      fedoraTrustStore.load(new FileInputStream(truststorePath), truststorePassword.toCharArray());
+      // ...under it's Subject DN as an alias...
+      fedoraTrustStore.setCertificateEntry(fedoraX509.getSubjectDN().toString(), fedoraX509);
+      // ...and rewrite the trust store
+      fedoraTrustStore.store(new FileOutputStream(truststorePath), truststorePassword.toCharArray());
+
+      connection.setAuthentication(repoConfig.getString(CONFIG_KEY_CONNECTION_USERNAME),
+                                   repoConfig.getString(CONFIG_KEY_CONNECTION_PASSWORD));
+      
+      return connection.getInputStream();
+    }
+    catch(Exception e) {
+      return null;
+    }
   }
 
   private DigitalItemInfo[] queryFedora(String pid) {
