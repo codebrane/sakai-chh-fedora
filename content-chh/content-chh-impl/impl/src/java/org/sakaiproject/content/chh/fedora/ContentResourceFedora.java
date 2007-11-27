@@ -32,7 +32,6 @@ import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.io.InputStream;
-import java.net.URL;
 
 /**
 * <p>ContentResource is the core interface for a Resource object in the GenericContentHostingService.</p>
@@ -50,7 +49,6 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
   
   public Edit wrap() {
     if (wrapped == null) {
-      //wrapped = chhResolver.newResourceEdit(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
       wrapped = chhResolver.newResourceEdit(getId());
       ((ContentEntity)wrapped).setContentHandler(chh);
       ((ContentEntity)wrapped).setVirtualContentEntity(this);
@@ -98,7 +96,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* @return The content byte length.
 	*/
 	public int getContentLength() {
-		return 522250;
+		return item.getContentLength();
 	}
 
 	/**
@@ -106,7 +104,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* @return The resource MIME type.
 	*/
 	public String getContentType() {
-		return "application/pdf";
+		return item.getMimeType();
 	}
 
 	/**
