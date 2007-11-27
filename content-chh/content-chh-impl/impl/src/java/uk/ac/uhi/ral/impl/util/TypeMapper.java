@@ -5,46 +5,59 @@
 
 package uk.ac.uhi.ral.impl.util;
 
-import info.fedora.definitions.x1.x0.types.ObjectFields;
 import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingHandler;
 import org.sakaiproject.content.api.ContentHostingHandlerResolver;
+import org.sakaiproject.content.api.ContentResourceEdit;
 import org.sakaiproject.content.chh.fedora.ContentCollectionFedora;
 import org.sakaiproject.content.chh.fedora.ContentResourceFedora;
+import org.sakaiproject.exception.ServerOverloadException;
+import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.entity.api.ResourceProperties;
 import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.impl.FedoraItemInfo;
 import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 public class TypeMapper {
-  public static DigitalItemInfo toDigitalItemInfo(ObjectFields fields) {
+  public static DigitalItemInfo toDigitalItemInfo(ContentResourceEdit edit) {
     DigitalItemInfo item = new FedoraItemInfo();
     FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
 
-    item.setDescription(fields.getLabel());
-    item.setDisplayName(fields.getTitleArray(0));
-    item.setCreator(fields.getCreatorArray(0));
-    item.setDescription(fields.getDescriptionArray(0));
-    //item.setType(fields.getTypeArray(0));
-    item.setType("TEST-TYPE");
+    try {
+      item.setTitle(edit.getId());
+      item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+      item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
+      item.setDescription((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
+      item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+      item.setIdentifier(edit.getId());
+      item.setMimeType(edit.getContentType());
+      item.setBinaryContent(edit.getContent());
+      item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
+      item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
+      item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
+      item.setType("TEST-TYPE");
 
-    item.setIsCollection(false);
-    item.setIsResource(true);
+      item.setIsCollection(false);
+      item.setIsResource(true);
+    }
+    catch(ServerOverloadException soe) {
+    }
 
-    privateInfo.setPid(fields.getPid());
-    privateInfo.setOwnerId(fields.getOwnerId());
+    privateInfo.setPid("");
+    privateInfo.setOwnerId(SessionManager.getCurrentSession().getUserEid());
 
     item.setPrivateInfo(privateInfo);
 
     return item;
   }
 
-  public static DigitalItemInfo[] toDigitalItemInfo(ObjectFields[] wsFields) {
-    DigitalItemInfo[] items = new DigitalItemInfo[wsFields.length];
+  public static DigitalItemInfo[] toDigitalItemInfo(ContentResourceEdit[] edits) {
+    DigitalItemInfo[] items = new DigitalItemInfo[edits.length];
 
     int count = 0;
-    for (ObjectFields fields : wsFields) {
-      items[count] = toDigitalItemInfo(fields);
+    for (ContentResourceEdit edit : edits) {
+      items[count] = toDigitalItemInfo(edit);
       count++;
     }
 
