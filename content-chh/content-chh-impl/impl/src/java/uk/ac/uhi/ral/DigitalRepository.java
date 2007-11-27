@@ -6,6 +6,7 @@
 package uk.ac.uhi.ral;
 
 import java.util.PropertyResourceBundle;
+import java.io.InputStream;
 
 public interface DigitalRepository {
   /** Defines the Fedora API-A access web service endpoint */
@@ -23,6 +24,7 @@ public interface DigitalRepository {
   public void modifyObject();
   public void deleteObject();
   public void search();
+  public InputStream getContentAsStream(String endpoint);
   public DigitalItemInfo generateItem();
   public DigitalItemInfo[] list();
   public DigitalItemInfo list(String id);
