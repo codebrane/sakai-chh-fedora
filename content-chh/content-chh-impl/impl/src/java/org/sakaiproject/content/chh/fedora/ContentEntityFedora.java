@@ -83,6 +83,10 @@ public abstract class ContentEntityFedora implements ContentEntity {
   abstract public Edit wrap();
   abstract protected void setVirtualProperties();
 
+  public DigitalItemInfo getItem() {
+    return item;
+  }
+
   protected String join(String base, String extension) {
     while (base.length() > 0 && base.charAt(base.length() - 1) == '/')
       base = base.substring(0, base.length() - 1);
