@@ -13,6 +13,7 @@ import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
 import uk.ac.uhi.ral.impl.util.TypeMapper;
 import uk.ac.uhi.ral.impl.util.TypeResolver;
+import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -116,6 +117,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
     }
     if (crFedora == null) return;
 
+    // m_event = content.revise for uploading new content
     crFedora.getRepository().createObject(TypeMapper.toDigitalItemInfo(edit));
   }
 
@@ -286,7 +288,10 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 */
 	public ContentResourceEdit putDeleteResource(String id, String uuid, String userId) {
     log.info(LOG_MARKER + "putDeleteResource");
-    return null;
+
+    ContentResourceEdit cre = (ContentResourceEdit)contentHostingHandlerResolver.newResourceEdit(id);
+    cre.setContentHandler(this);
+    return cre;
 	}
 
 	/**
@@ -305,6 +310,18 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
 	 */
 	public void removeResource(ContentResourceEdit edit) {
     log.info(LOG_MARKER + "removeResource");
+
+    ContentResourceFedora crf = null;
+    if (edit instanceof ContentResourceFedora)
+      crf = (ContentResourceFedora)edit;
+    else {
+      if (edit.getVirtualContentEntity() instanceof ContentResourceFedora) {
+        crf = (ContentResourceFedora)edit.getVirtualContentEntity();
+      }
+    }
+    if (crf == null) return;
+
+    crf.getRepository().deleteObject(((FedoraPrivateItemInfo)(crf.getItem().getPrivateInfo())).getPid());
   }
 
 	/**
