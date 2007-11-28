@@ -51,13 +51,18 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   private HttpTransportProperties.Authenticator authenticator = null;
   /** Our custom protocol handler which supports SSL probing */
   private Protocol customProtocolHandler = null;
+  private boolean debug = false;
+  private String debugOutputPath = null;
 
   public FedoraDigitalRepositoryImpl(String keystorePath, String keystorePassword,
-                                     String truststorePath, String truststorePassword) {
+                                     String truststorePath, String truststorePassword,
+                                     boolean debug, String debugOutputPath) {
     this.keystorePath = keystorePath;
     this.keystorePassword = keystorePassword;
     this.truststorePath = truststorePath;
     this.truststorePassword = truststorePassword;
+    this.debug = debug;
+    this.debugOutputPath = debugOutputPath;
   }
 
   public PropertyResourceBundle getRepoConfig() {
@@ -245,7 +250,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     objDatastream.setCONTROLGROUP(DatastreamType.CONTROLGROUP.M);
 
     DatastreamVersionType objDatastreamVersion = objDatastream.addNewDatastreamVersion();
-    objDatastreamVersion.setID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+    objDatastreamVersion.setID("TEST");
     objDatastreamVersion.setMIMETYPE(item.getMimeType());
     objDatastreamVersion.setLABEL(item.getTitle());
 
@@ -260,6 +265,10 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
                                         "info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-0.xsd");
 
     ingest.setObjectXML(Utils.xmlToString(objectDoc).getBytes());
+
+    if (debug) {
+      Utils.dumpXML(objectDoc, debugOutputPath + System.getProperty("file.separator") + "ingest.xml");
+    }
 
     try {
       // Initiate the client connection to the API-A endpoint
@@ -418,6 +427,10 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
             item.setMimeType(stream.getMIMEType());
             item.setBinaryContent(stream.getStream());
+            // https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:002/PDF
+            item.setURL(repoConfig.getString(CONFIG_KEY_DISSEMINATION_ENDPOINT) + "/" +
+                        field.getPid() + "/" +
+                        "PDF");
           }
         }
 
