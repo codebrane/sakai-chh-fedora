@@ -23,6 +23,8 @@
     <property name="keystorePassword"><value>tomcat</value></property>
     <property name="truststorePath"><value>/Users/alistair/dev/sakai/tomcat/apache-tomcat-5.5.25/components/sakai-content-chh-fedora-pack/WEB-INF/fedora/truststore</value></property>
     <property name="truststorePassword"><value>tomcat</value></property>
+    <property name="debug"><value>true</value></property>
+    <property name="debugOutputPath"><value>/Users/alistair/Desktop</value></property>
   </bean>
 
   <!--
