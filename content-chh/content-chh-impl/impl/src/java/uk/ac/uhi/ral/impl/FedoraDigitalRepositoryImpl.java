@@ -295,7 +295,6 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   }
 
   public void modifyObject() {}
-  public void deleteObject() {}
   public void search() {}
 
   public DigitalItemInfo[] list() {
@@ -442,6 +441,39 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     }
     catch(RemoteException re) {
       return null;
+    }
+  }
+
+  public boolean deleteObject(String pid) {
+    PurgeObjectDocument doc = PurgeObjectDocument.Factory.newInstance();
+    PurgeObjectDocument.PurgeObject purge = doc.addNewPurgeObject();
+
+    purge.setPid(pid);
+    //purge.setLogMessage(repositoryProperties.getString(PROPS_KEY_PURGE_LOG_MESSAGE));
+    // fedora.server.errors.GeneralException: Forced object removal is not yet supported.
+    purge.setForce(false);
+
+    try {
+      // Initiate the client connection to the API-A endpoint
+      FedoraAPIMServiceStub stub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
+
+      // Add the auth creds to the client
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      // Register our custom SSL handler for this connection
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+
+      // Call the web service
+      PurgeObjectResponseDocument outDoc = stub.purgeObject(doc);
+
+      // 2007-10-15T08:59:46.827Z
+      if (outDoc.getPurgeObjectResponse().getPurgedDate() != null)
+        return true;
+      else
+        return false;
+    }
+    catch(RemoteException re) {
+      log.error(re);
+      return false;
     }
   }
 }
