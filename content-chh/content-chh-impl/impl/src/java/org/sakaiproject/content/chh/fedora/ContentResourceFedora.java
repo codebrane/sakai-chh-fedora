@@ -114,7 +114,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* 			if server is configured to save resource body in filesystem and an error occurs while 
 	* 			trying to access the filesystem.
 	*/
-	public byte[] getContent() throws ServerOverloadException {
+  public byte[] getContent() throws ServerOverloadException {
 		return null;
 	}
 
@@ -126,7 +126,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	 */
 	public InputStream streamContent() throws ServerOverloadException {
     try {
-      return repo.getContentAsStream("https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:001/PDF");
+      return repo.getContentAsStream(item.getURL());
     }
     catch(Exception e) {
       return null;
