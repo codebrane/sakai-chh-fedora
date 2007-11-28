@@ -13,6 +13,8 @@ public interface DigitalRepository {
   public static final String CONFIG_KEY_API_A_ENDPOINT = "api-a.endpoint";
   /** Defines the Fedora API-M management web service endpoint */
   public static final String CONFIG_KEY_API_M_ENDPOINT = "api-m.endpoint";
+  /** Defines the Fedora API-M management web service endpoint */
+  public static final String CONFIG_KEY_DISSEMINATION_ENDPOINT = "dissemination.endpoint";
   /** The username for the connection */
   public static final String CONFIG_KEY_CONNECTION_USERNAME = "connection.username";
   /** The password for the connection */
