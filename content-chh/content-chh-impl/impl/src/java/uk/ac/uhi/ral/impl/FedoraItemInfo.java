@@ -122,7 +122,10 @@ public class FedoraItemInfo implements DigitalItemInfo {
   }
 
   public int getContentLength() {
-    return binaryContent.length;
+    if (binaryContent == null)
+      return 0;
+    else
+      return binaryContent.length;
   }
 
   public void setIsResource(boolean resource) {
