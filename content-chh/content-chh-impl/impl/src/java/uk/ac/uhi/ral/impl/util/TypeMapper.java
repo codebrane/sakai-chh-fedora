@@ -16,63 +16,11 @@ import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
 import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
-import uk.ac.uhi.ral.impl.FedoraItemInfo;
 import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.rmi.server.UID;
 
 public class TypeMapper {
-  public static DigitalItemInfo toDigitalItemInfo(ContentResourceEdit edit) {
-    DigitalItemInfo item = new FedoraItemInfo();
-    FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
-
-    try {
-      item.setTitle((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
-      item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
-      item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
-      item.setDescription((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
-      item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
-      item.setIdentifier(edit.getId());
-      item.setMimeType(edit.getContentType());
-      item.setBinaryContent(Utils.getContentBytes(edit.streamContent()));
-      item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
-      item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
-      item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
-      item.setType("TEST-TYPE");
-
-      if (item.getTitle() == null) item.setTitle("NOT_SET");
-      if (item.getCreator() == null) item.setCreator("NOT_SET");
-      if (item.getSubject() == null) item.setSubject("NOT_SET");
-      if (item.getDescription() == null) item.setDescription("NOT_SET");
-      if (item.getPublisher() == null) item.setPublisher("NOT_SET");
-      if (item.getIdentifier() == null) item.setIdentifier("NOT_SET");
-
-      item.setIsCollection(false);
-      item.setIsResource(true);
-    }
-    catch(ServerOverloadException soe) {
-    }
-
-    privateInfo.setPid("demo:" + new UID().toString().replaceAll(":", ""));
-    privateInfo.setOwnerId(SessionManager.getCurrentSession().getUserEid());
-
-    item.setPrivateInfo(privateInfo);
-
-    return item;
-  }
-
-  public static DigitalItemInfo[] toDigitalItemInfo(ContentResourceEdit[] edits) {
-    DigitalItemInfo[] items = new DigitalItemInfo[edits.length];
-
-    int count = 0;
-    for (ContentResourceEdit edit : edits) {
-      items[count] = toDigitalItemInfo(edit);
-      count++;
-    }
-
-    return items;
-  }
-
   public static ContentEntity toContentEntity(DigitalItemInfo item,
                                               ContentEntity realParent, String relativePath,
                                               ContentHostingHandler chh,
@@ -106,7 +54,7 @@ public class TypeMapper {
     return entities;
   }
 
-  public static DigitalItemInfo updateDigitalItemInfoMetadata(DigitalItemInfo item, ContentResourceEdit edit) {
+  public static DigitalItemInfo updateDigitalItemInfo(DigitalItemInfo item, ContentResourceEdit edit) {
     item.setTitle((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
     item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
     item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
@@ -114,17 +62,32 @@ public class TypeMapper {
     item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
     item.setIdentifier(edit.getId());
     item.setMimeType(edit.getContentType());
+    try {
+      if (edit.streamContent() != null) {
+        item.setBinaryContent(Utils.getContentBytes(edit.streamContent()));
+      }
+    }
+    catch(ServerOverloadException soe) {
+    }
     item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
     item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
     item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
     item.setType("TEST-TYPE");
 
-    if (item.getTitle() == null) item.setTitle("NOT_SET");
-    if (item.getCreator() == null) item.setCreator("NOT_SET");
-    if (item.getSubject() == null) item.setSubject("NOT_SET");
-    if (item.getDescription() == null) item.setDescription("NOT_SET");
-    if (item.getPublisher() == null) item.setPublisher("NOT_SET");
-    if (item.getIdentifier() == null) item.setIdentifier("NOT_SET");
+    if (item.getTitle() == null) item.setTitle("TITLE_NOT_SET");
+    if (item.getCreator() == null) item.setCreator("CREATOR_NOT_SET");
+    if (item.getSubject() == null) item.setSubject("SUBJECT_NOT_SET");
+    if (item.getDescription() == null) item.setDescription("DESCRIPTION_NOT_SET");
+    if (item.getPublisher() == null) item.setPublisher("PUBLISHER_NOT_SET");
+    if (item.getIdentifier() == null) item.setIdentifier("IDENTIFIER_NOT_SET");
+
+    if (item.getPrivateInfo() == null) {
+      item.setPrivateInfo(new FedoraPrivateItemInfo());
+      item.setIsResource(true);
+      item.setIsCollection(false);
+      ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setPid("demo:" + new UID().toString().replaceAll(":", ""));
+      ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setOwnerId(SessionManager.getCurrentSession().getUserEid());
+    }
 
     return item;
   }
