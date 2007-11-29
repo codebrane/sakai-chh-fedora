@@ -8,6 +8,7 @@ package uk.ac.uhi.ral.impl;
 public class FedoraPrivateItemInfo {
   private String pid = null;
   private String ownerId = null;
+  private String contentDatastreamID = null;
   private String dcDatastreamID = null;
   private String relsextDatastreamID = null;
 
@@ -25,6 +26,14 @@ public class FedoraPrivateItemInfo {
 
   public void setPid(String pid) {
     this.pid = pid;
+  }
+
+  public void setContentDatastreamID(String contentDatastreamID) {
+    this.contentDatastreamID = contentDatastreamID;
+  }
+
+  public String getContentDatastreamID() {
+    return contentDatastreamID;
   }
 
   public void setDCDatastreamID(String dcDatastreamID) {
