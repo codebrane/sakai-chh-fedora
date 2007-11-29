@@ -429,6 +429,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
             // https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:002/PDF
             item.setURL(repoConfig.getString(CONFIG_KEY_DISSEMINATION_ENDPOINT) + "/" +
                         field.getPid() + "/" + def.getID());
+            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setContentDatastreamID(def.getID());
 
             count++;
           }
@@ -488,7 +489,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     }
   }
 
-  public boolean modifyObject(DigitalItemInfo item) {
+  public boolean modifyObject(DigitalItemInfo item, String dsID, byte[] dsContent) {
     try {
       // Initiate the client connection to the API-A endpoint
       FedoraAPIMServiceStub stub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
@@ -501,17 +502,20 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
       GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
       dsIn.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
-      dsIn.setDsID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID());
+      dsIn.setDsID(dsID);
       GetDatastreamResponseDocument dsOutDoc = stub.getDatastream(dsInDoc);
       Datastream ds = dsOutDoc.getGetDatastreamResponse().getDatastream();
 
       ModifyDatastreamByValueDocument inDoc = ModifyDatastreamByValueDocument.Factory.newInstance();
       ModifyDatastreamByValueDocument.ModifyDatastreamByValue in = inDoc.addNewModifyDatastreamByValue();
 
-//      in.setChecksum("");
-//      in.setChecksumType("");
-      in.setDsContent(Utils.getDCBytes(item, ds));
-      in.setDsID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID());
+      if (dsID.equals("DC")) {
+        in.setDsContent(Utils.getDCBytes(item, ds));
+      }
+      else {
+        in.setDsContent(dsContent);
+      }
+      in.setDsID(dsID);
       in.setDsLabel(ds.getLabel());
       in.setForce(true);
       in.setLogMessage("Update from Sakai");
@@ -530,6 +534,24 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     catch(RemoteException re) {
       log.error(re);
       return false;
+    }
+  }
+
+  public boolean commitObject(DigitalItemInfo item) {
+    // If the object already exists, update it
+    if (list(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid()) != null) {
+      // There's no way to tell if this is a content update, so do it anyway, just in case
+      if (item.getBinaryContent() != null) {
+        modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getContentDatastreamID(),
+                     item.getBinaryContent());
+      }
+
+      // Now update the DC metadata - the method will get the binary content from Fedora
+      return modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID(), null);
+    }
+    // Otherwise, create it
+    else {
+      return createObject(item);
     }
   }
 
