@@ -23,11 +23,12 @@ public interface DigitalRepository {
   public PropertyResourceBundle getRepoConfig();
   public void init(PropertyResourceBundle config);
   public boolean createObject(DigitalItemInfo item);
-  public boolean modifyObject(DigitalItemInfo item);
+  public boolean modifyObject(DigitalItemInfo item, String dsID, byte[] dsContent);
   public boolean deleteObject(String pid);
   public void search();
   public InputStream getContentAsStream(String endpoint);
   public DigitalItemInfo generateItem();
   public DigitalItemInfo[] list();
   public DigitalItemInfo list(String id);
+  public boolean commitObject(DigitalItemInfo item);
 }
