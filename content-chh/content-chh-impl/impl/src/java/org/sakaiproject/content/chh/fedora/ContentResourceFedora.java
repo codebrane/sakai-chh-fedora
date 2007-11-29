@@ -104,7 +104,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* @return The resource MIME type.
 	*/
 	public String getContentType() {
-		return item.getMimeType();
+    return item.getMimeType();
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class ContentResourceFedora extends ContentEntityFedora implements Conten
 	* 			trying to access the filesystem.
 	*/
   public byte[] getContent() throws ServerOverloadException {
-		return null;
+		return item.getBinaryContent();
 	}
 
 	/**
