@@ -11,9 +11,9 @@ import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
+import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 import uk.ac.uhi.ral.impl.util.TypeMapper;
 import uk.ac.uhi.ral.impl.util.TypeResolver;
-import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -117,8 +117,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
     }
     if (crFedora == null) return;
 
-    // m_event = content.revise for uploading new content
-    crFedora.getRepository().createObject(TypeMapper.toDigitalItemInfo(edit));
+    crFedora.getRepository().commitObject(TypeMapper.updateDigitalItemInfo(crFedora.getItem(), edit));
   }
 
 	/**
@@ -254,15 +253,6 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
       repo.init(config);
 
       //ThreadLocalManager.set("FEDORA" + edit.getId(), repo);
-
-      /*
-      DigitalItemInfo item = new FedoraItemInfo();
-      item.setDescription("TEST");
-      item.setCreator("TEST");
-      item.setDisplayName("TEST");
-      item.setModifiedDate("TEST");
-      item.setDisplayName("TEST");
-      */
 
       ContentEntityFedora entity = (ContentEntityFedora)TypeResolver.resolveEntity(edit, finalId.substring(edit.getId().length()), this,
                                                                                    contentHostingHandlerResolver, repo);
