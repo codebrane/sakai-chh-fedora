@@ -23,7 +23,7 @@ public interface DigitalRepository {
   public PropertyResourceBundle getRepoConfig();
   public void init(PropertyResourceBundle config);
   public boolean createObject(DigitalItemInfo item);
-  public void modifyObject();
+  public boolean modifyObject(DigitalItemInfo item);
   public boolean deleteObject(String pid);
   public void search();
   public InputStream getContentAsStream(String endpoint);
