@@ -55,13 +55,27 @@ public class TypeMapper {
   }
 
   public static DigitalItemInfo updateDigitalItemInfo(DigitalItemInfo item, ContentResourceEdit edit) {
-    item.setTitle((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
-    item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
-    item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
-    item.setDescription((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
-    item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+    if (edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME) != null)
+      item.setTitle((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
+    if (edit.getProperties().get(ResourceProperties.PROP_CREATOR) != null)
+      item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+    if (edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION) != null)
+      item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
+    if (edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION) != null)
+      item.setDescription((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
+    if (edit.getProperties().get(ResourceProperties.PROP_CREATOR) != null)
+      item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+    if (edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME) != null)
+      item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
+    if (edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE) != null)
+      item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
+    if (edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME) != null)
+      item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
+
+    item.setType("TEST-TYPE");
     item.setIdentifier(edit.getId());
     item.setMimeType(edit.getContentType());
+    
     try {
       if (edit.streamContent() != null) {
         item.setBinaryContent(Utils.getContentBytes(edit.streamContent()));
@@ -69,10 +83,6 @@ public class TypeMapper {
     }
     catch(ServerOverloadException soe) {
     }
-    item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
-    item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
-    item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
-    item.setType("TEST-TYPE");
 
     if (item.getTitle() == null) item.setTitle("TITLE_NOT_SET");
     if (item.getCreator() == null) item.setCreator("CREATOR_NOT_SET");
