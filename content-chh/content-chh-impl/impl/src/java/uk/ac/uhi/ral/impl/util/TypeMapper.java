@@ -19,9 +19,6 @@ import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.impl.FedoraItemInfo;
 import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.rmi.server.UID;
 
 public class TypeMapper {
@@ -30,29 +27,14 @@ public class TypeMapper {
     FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
 
     try {
-      item.setTitle(edit.getId());
+      item.setTitle((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
       item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
       item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
       item.setDescription((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
       item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
       item.setIdentifier(edit.getId());
       item.setMimeType(edit.getContentType());
-
-
-      int bytesRead = 0;
-      byte[] buffer = new byte[1024];
-      InputStream is = edit.streamContent();
-      ByteArrayOutputStream bytes = new ByteArrayOutputStream(2048);
-      try {
-        while ((bytesRead = is.read(buffer)) != -1) {
-          bytes.write(buffer, 0, bytesRead);
-        }
-
-        item.setBinaryContent(bytes.toByteArray());
-      }
-      catch (IOException e) {
-      }
-
+      item.setBinaryContent(Utils.getContentBytes(edit.streamContent()));
       item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
       item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
       item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
@@ -122,5 +104,28 @@ public class TypeMapper {
     }
 
     return entities;
+  }
+
+  public static DigitalItemInfo updateDigitalItemInfoMetadata(DigitalItemInfo item, ContentResourceEdit edit) {
+    item.setTitle((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
+    item.setCreator((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+    item.setSubject((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
+    item.setDescription((String)edit.getProperties().get(ResourceProperties.PROP_DESCRIPTION));
+    item.setPublisher((String)edit.getProperties().get(ResourceProperties.PROP_CREATOR));
+    item.setIdentifier(edit.getId());
+    item.setMimeType(edit.getContentType());
+    item.setDisplayName((String)edit.getProperties().get(ResourceProperties.PROP_DISPLAY_NAME));
+    item.setModifiedDate((String)edit.getProperties().get(ResourceProperties.PROP_MODIFIED_DATE));
+    item.setOriginalFilename((String)edit.getProperties().get(ResourceProperties.PROP_ORIGINAL_FILENAME));
+    item.setType("TEST-TYPE");
+
+    if (item.getTitle() == null) item.setTitle("NOT_SET");
+    if (item.getCreator() == null) item.setCreator("NOT_SET");
+    if (item.getSubject() == null) item.setSubject("NOT_SET");
+    if (item.getDescription() == null) item.setDescription("NOT_SET");
+    if (item.getPublisher() == null) item.setPublisher("NOT_SET");
+    if (item.getIdentifier() == null) item.setIdentifier("NOT_SET");
+
+    return item;
   }
 }
