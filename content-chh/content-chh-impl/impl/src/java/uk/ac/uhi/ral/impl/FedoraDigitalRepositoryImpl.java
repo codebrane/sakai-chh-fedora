@@ -202,7 +202,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     dc.appendChild(dcPublisher);
 
     Element dcIdentifier = xmlContent.getDomNode().getOwnerDocument().createElementNS("dc", "identifier");
-    textNode = xmlContent.getDomNode().getOwnerDocument().createTextNode(item.getIdentifier());
+    textNode = xmlContent.getDomNode().getOwnerDocument().createTextNode(item.getTitle());
     dcIdentifier.appendChild(textNode);
     dc.appendChild(dcIdentifier);
 
@@ -293,9 +293,6 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       return false;
     }
   }
-
-  public void modifyObject() {}
-  public void search() {}
 
   public DigitalItemInfo[] list() {
     return queryFedora(null);
@@ -388,6 +385,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
       Vector<DigitalItemInfo> items = new Vector<DigitalItemInfo>();
 
+      // Loop through all the objects that were found
       for (ObjectFields field : fields) {
         FedoraItemInfo item = new FedoraItemInfo();
 
@@ -414,22 +412,35 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
         ds.setPid(field.getPid());
         ListDatastreamsResponseDocument dsOutDoc = stub.listDatastreams(dsDoc);
         DatastreamDef[] defs = dsOutDoc.getListDatastreamsResponse().getDatastreamDefArray();
-        
-        for (DatastreamDef def : defs) {
-          if (def.getID().equals("PDF")) {
-            GetDatastreamDisseminationDocument dissDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
-            GetDatastreamDisseminationDocument.GetDatastreamDissemination diss = dissDoc.addNewGetDatastreamDissemination();
-            diss.setDsID(def.getID());
-            diss.setPid(field.getPid());
-            GetDatastreamDisseminationResponseDocument dissOutDoc = stub.getDatastreamDissemination(dissDoc);
-            MIMETypedStream stream = dissOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
 
+        int count = 0;
+        for (DatastreamDef def : defs) {
+          GetDatastreamDisseminationDocument dissDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
+          GetDatastreamDisseminationDocument.GetDatastreamDissemination diss = dissDoc.addNewGetDatastreamDissemination();
+          diss.setDsID(def.getID());
+          diss.setPid(field.getPid());
+          GetDatastreamDisseminationResponseDocument dissOutDoc = stub.getDatastreamDissemination(dissDoc);
+          MIMETypedStream stream = dissOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
+          
+          // The first one seems to be the default content, such as PDF etc, with the rest being the DC and RELS-EXT
+          if (count == 0) {
             item.setMimeType(stream.getMIMEType());
             item.setBinaryContent(stream.getStream());
             // https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:002/PDF
             item.setURL(repoConfig.getString(CONFIG_KEY_DISSEMINATION_ENDPOINT) + "/" +
-                        field.getPid() + "/" +
-                        "PDF");
+                        field.getPid() + "/" + def.getID());
+
+            count++;
+          }
+
+          // Dublin core datastream
+          if (def.getID().equals("DC")) {
+            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setDCDatastreamID(def.getID());
+          }
+
+          // RELS-EXT core datastream
+          if (def.getID().equals("RELS-EXT")) {
+            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setRelsExtDatastreamID(def.getID());
           }
         }
 
@@ -476,4 +487,51 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       return false;
     }
   }
+
+  public boolean modifyObject(DigitalItemInfo item) {
+    try {
+      // Initiate the client connection to the API-A endpoint
+      FedoraAPIMServiceStub stub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
+
+      // Add the auth creds to the client
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      // Register our custom SSL handler for this connection
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+
+      GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
+      GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
+      dsIn.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      dsIn.setDsID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID());
+      GetDatastreamResponseDocument dsOutDoc = stub.getDatastream(dsInDoc);
+      Datastream ds = dsOutDoc.getGetDatastreamResponse().getDatastream();
+
+      ModifyDatastreamByValueDocument inDoc = ModifyDatastreamByValueDocument.Factory.newInstance();
+      ModifyDatastreamByValueDocument.ModifyDatastreamByValue in = inDoc.addNewModifyDatastreamByValue();
+
+//      in.setChecksum("");
+//      in.setChecksumType("");
+      in.setDsContent(Utils.getDCBytes(item, ds));
+      in.setDsID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID());
+      in.setDsLabel(ds.getLabel());
+      in.setForce(true);
+      in.setLogMessage("Update from Sakai");
+      in.setMIMEType(ds.getMIMEType());
+      in.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+
+      // Call the web service
+      ModifyDatastreamByValueResponseDocument outDoc = stub.modifyDatastreamByValue(inDoc);
+
+      // 2007-10-15T08:59:46.827Z
+      if (outDoc.getModifyDatastreamByValueResponse().getModifiedDate() != null)
+        return true;
+      else
+        return false;
+    }
+    catch(RemoteException re) {
+      log.error(re);
+      return false;
+    }
+  }
+
+  public void search() {}
 }
