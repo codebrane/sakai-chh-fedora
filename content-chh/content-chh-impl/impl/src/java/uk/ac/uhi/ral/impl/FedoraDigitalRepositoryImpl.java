@@ -11,6 +11,10 @@ import fedora.webservices.client.api.m.FedoraAPIMServiceStub;
 import info.fedora.definitions.x1.x0.types.*;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,9 +27,7 @@ import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.impl.util.Utils;
 
 import javax.xml.namespace.QName;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.security.KeyStore;
@@ -36,6 +38,8 @@ import java.util.Vector;
 public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   /** The format and version of ingest messages */
   private static final String DIGITAL_OBJECT_FORMAT_FOXML = "foxml1.0";
+  private static final boolean INLINE_UPDATE = true;
+  private static final boolean NOT_INLINE_UPDATE = false;
 
   private static final Log log = LogFactory.getLog(FedoraDigitalRepositoryImpl.class);
 
@@ -489,7 +493,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     }
   }
 
-  public boolean modifyObject(DigitalItemInfo item, String dsID, byte[] dsContent) {
+  public boolean modifyObject(DigitalItemInfo item, String dsID, byte[] dsContent, boolean inline) {
     try {
       // Initiate the client connection to the API-A endpoint
       FedoraAPIMServiceStub stub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
@@ -506,30 +510,45 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       GetDatastreamResponseDocument dsOutDoc = stub.getDatastream(dsInDoc);
       Datastream ds = dsOutDoc.getGetDatastreamResponse().getDatastream();
 
-      ModifyDatastreamByValueDocument inDoc = ModifyDatastreamByValueDocument.Factory.newInstance();
-      ModifyDatastreamByValueDocument.ModifyDatastreamByValue in = inDoc.addNewModifyDatastreamByValue();
-
-      if (dsID.equals("DC")) {
+      if (inline) {
+        ModifyDatastreamByValueDocument inDoc = ModifyDatastreamByValueDocument.Factory.newInstance();
+        ModifyDatastreamByValueDocument.ModifyDatastreamByValue in = inDoc.addNewModifyDatastreamByValue();
         in.setDsContent(Utils.getDCBytes(item, ds));
+        in.setDsID(dsID);
+        in.setDsLabel(ds.getLabel());
+        in.setForce(true);
+        in.setLogMessage("Update from Sakai");
+        in.setMIMEType(ds.getMIMEType());
+        in.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+
+        // Call the web service
+        ModifyDatastreamByValueResponseDocument outDoc = stub.modifyDatastreamByValue(inDoc);
+
+        // 2007-10-15T08:59:46.827Z
+        if (outDoc.getModifyDatastreamByValueResponse().getModifiedDate() != null)
+          return true;
+        else
+          return false;
       }
       else {
-        in.setDsContent(dsContent);
+        // Updating content requires an upload url from which the new content will be ingested.
+        ModifyDatastreamByReferenceDocument inDoc = ModifyDatastreamByReferenceDocument.Factory.newInstance();
+        ModifyDatastreamByReferenceDocument.ModifyDatastreamByReference in = inDoc.addNewModifyDatastreamByReference();
+        in.setDsLocation(getUploadURL(dsContent));
+        in.setDsID(dsID);
+        in.setDsLabel(ds.getLabel());
+        in.setForce(true);
+        in.setLogMessage("Update from Sakai");
+        in.setMIMEType(ds.getMIMEType());
+        in.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+
+        ModifyDatastreamByReferenceResponseDocument outDoc = stub.modifyDatastreamByReference(inDoc);
+
+        if (outDoc.getModifyDatastreamByReferenceResponse().getModifiedDate() != null)
+          return true;
+        else
+          return false;
       }
-      in.setDsID(dsID);
-      in.setDsLabel(ds.getLabel());
-      in.setForce(true);
-      in.setLogMessage("Update from Sakai");
-      in.setMIMEType(ds.getMIMEType());
-      in.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
-
-      // Call the web service
-      ModifyDatastreamByValueResponseDocument outDoc = stub.modifyDatastreamByValue(inDoc);
-
-      // 2007-10-15T08:59:46.827Z
-      if (outDoc.getModifyDatastreamByValueResponse().getModifiedDate() != null)
-        return true;
-      else
-        return false;
     }
     catch(RemoteException re) {
       log.error(re);
@@ -543,11 +562,12 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       // There's no way to tell if this is a content update, so do it anyway, just in case
       if (item.getBinaryContent() != null) {
         modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getContentDatastreamID(),
-                     item.getBinaryContent());
+                     item.getBinaryContent(), NOT_INLINE_UPDATE);
       }
 
       // Now update the DC metadata - the method will get the binary content from Fedora
-      return modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID(), null);
+      return modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getDCDatastreamID(),
+                                 null, INLINE_UPDATE);
     }
     // Otherwise, create it
     else {
@@ -556,4 +576,61 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   }
 
   public void search() {}
+
+  private String getUploadURL(byte[] content) {
+    String lineEnd = "\r\n";
+    String twoHyphens = "--";
+    String boundary =  "*****";
+    String exsistingFileName = "tmp"; // must be this for Fedora upload servlet
+    
+    try {
+      EntityConnection connection = new EntityConnection(repoConfig.getString(CONFIG_KEY_UPLOAD_URL),
+                                                         "test-keystore-alias",
+                                                         keystorePath, keystorePassword,
+                                                         truststorePath, truststorePassword,
+                                                         EntityConnection.PROBING_ON);
+      X509Certificate fedoraX509 = connection.getServerCertificate();
+      KeyStore fedoraTrustStore = KeyStore.getInstance("jks");
+      fedoraTrustStore.load(new FileInputStream(truststorePath), truststorePassword.toCharArray());
+      // ...under it's Subject DN as an alias...
+      fedoraTrustStore.setCertificateEntry(fedoraX509.getSubjectDN().toString(), fedoraX509);
+      // ...and rewrite the trust store
+      fedoraTrustStore.store(new FileOutputStream(truststorePath), truststorePassword.toCharArray());
+
+      connection.setDoOutput(true);
+      connection.setRequestMethod("POST");
+      connection.setRequestProperty("Connection", "Keep-Alive");
+      connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+      connection.setAuthentication(repoConfig.getString(CONFIG_KEY_CONNECTION_USERNAME),
+                                   repoConfig.getString(CONFIG_KEY_CONNECTION_PASSWORD));
+
+      DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+      out.writeBytes(twoHyphens + boundary + lineEnd);
+      out.writeBytes("Content-Disposition: form-data; name=\"file\";" +
+                     " filename=\"" + exsistingFileName + "\"" + lineEnd);
+      out.writeBytes(lineEnd);
+      out.write(content);
+      out.writeBytes(lineEnd);
+      out.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+      out.flush();
+      out.close();
+      String uploadURL = connection.getContentAsString();
+      /*
+      String uploadURL = null;
+      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      String str;
+      while ((str = in.readLine()) != null) {
+        System.out.println("Server response is: "+str);
+        System.out.println("");
+      }
+      in.close();
+      */
+      connection.disconnect();
+      return uploadURL.trim();
+    }
+    catch(Exception e) {
+      log.error(e);
+      return null;
+    }
+  }
 }
