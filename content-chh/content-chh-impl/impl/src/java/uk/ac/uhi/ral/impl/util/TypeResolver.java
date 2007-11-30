@@ -38,11 +38,10 @@ public class TypeResolver {
       relativePath = "/" + relativePath;
       item.setIsCollection(true);
       item.setIsResource(false);
-      item.setDescription("TEST");
+      item.setDescription(repo.getRepoConfig().getString(DigitalRepository.CONFIG_KEY_DISPLAY_NAME));
       item.setCreator("TEST");
-      item.setDisplayName("TEST");
+      item.setDisplayName(repo.getRepoConfig().getString(DigitalRepository.CONFIG_KEY_DISPLAY_NAME));
       item.setModifiedDate("TEST");
-      item.setDisplayName("TEST");
     }
     else {
       item = repo.list(relativePath);
