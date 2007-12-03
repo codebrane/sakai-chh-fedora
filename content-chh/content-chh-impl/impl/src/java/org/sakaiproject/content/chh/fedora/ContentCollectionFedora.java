@@ -28,7 +28,7 @@ import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.ResourceProperties;
 import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
-import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
+import uk.ac.uhi.ral.impl.fedora.FedoraPrivateItemInfo;
 
 import java.util.ArrayList;
 import java.util.List;

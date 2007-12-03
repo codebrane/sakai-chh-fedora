@@ -36,7 +36,7 @@ import java.util.Stack;
 
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalItemInfo;
-import uk.ac.uhi.ral.impl.util.TypeResolver;
+import uk.ac.uhi.ral.impl.fedora.util.TypeResolver;
 
 public abstract class ContentEntityFedora implements ContentEntity {
   protected String relativePath = null;

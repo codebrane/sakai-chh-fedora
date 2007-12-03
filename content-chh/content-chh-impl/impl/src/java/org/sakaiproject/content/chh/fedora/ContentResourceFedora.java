@@ -29,7 +29,7 @@ import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.exception.ServerOverloadException;
 import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
-import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
+import uk.ac.uhi.ral.impl.fedora.FedoraPrivateItemInfo;
 
 import java.io.InputStream;
 
