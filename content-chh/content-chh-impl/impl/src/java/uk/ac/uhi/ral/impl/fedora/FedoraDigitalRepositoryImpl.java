@@ -228,11 +228,9 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     rdfDescription.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "about", "info:fedora/" + ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
     rdfRoot.appendChild(rdfDescription);
 
-    /*
     Element fedIsMemberOfCollection = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("fedora", "isMemberOfCollection");
-    fedIsMemberOfCollection.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource", "info:fedora/test:collection1");
+    fedIsMemberOfCollection.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource", "info:fedora/demo:testcollection");
     rdfDescription.appendChild(fedIsMemberOfCollection);
-    */
 
     Element owner = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("http://www.nsdl.org/ontologies/relationships#", "owner");
     Text ownerTextNode = rdfXmlContent.getDomNode().getOwnerDocument().createTextNode(item.getCreator());
@@ -389,18 +387,42 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       for (ObjectFields field : fields) {
         FedoraItemInfo item = new FedoraItemInfo();
 
-        item.setCreator(field.getCreatorArray(0));
-        item.setDescription(field.getDescriptionArray(0));
-        item.setDisplayName(field.getTitleArray(0));
+        if (field.getCreatorArray().length > 0)
+          item.setCreator(field.getCreatorArray(0));
+        else
+          item.setCreator("NOT_SET");
+
+        if (field.getDescriptionArray().length > 0)
+          item.setDescription(field.getDescriptionArray(0));
+        else
+          item.setDescription("NOT_SET");
+
+        if (field.getTitleArray().length > 0)
+          item.setDisplayName(field.getTitleArray(0));
+        else
+          item.setDisplayName("NOT_SET");
+
+        if (field.getPublisherArray().length > 0)
+          item.setPublisher(field.getPublisherArray(0));
+        else
+          item.setPublisher("NOT_SET");
+
+        if (field.getSubjectArray().length > 0)
+          item.setSubject(field.getSubjectArray(0));
+        else
+          item.setSubject("NOT_SET");
+
+        if (field.getTitleArray().length > 0)
+          item.setTitle(field.getTitleArray(0));
+        else
+          item.setTitle("NOT_SET");
+
         item.setIdentifier(field.getPid());
         item.setModifiedDate(field.getMDate());
         item.setOriginalFilename(field.getPid());
-        item.setPublisher(field.getPublisherArray(0));
-        item.setSubject(field.getSubjectArray(0));
-        item.setTitle(field.getTitleArray(0));
-        //item.setType(field.getTypeArray(0));
         item.setIsCollection(false);
         item.setIsResource(true);
+        //item.setType(field.getTypeArray(0));
 
         FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
         privateInfo.setPid(field.getPid());
