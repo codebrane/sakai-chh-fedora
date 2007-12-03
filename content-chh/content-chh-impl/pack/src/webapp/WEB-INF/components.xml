@@ -38,6 +38,7 @@
     api-a.endpoint=http://your.fedora.url/fedora/services/access
     api-m.endpoint=http://your.fedora.url/fedora/services/management
     dissemination.endpoint=https://sgarbh.smo.uhi.ac.uk:8101/fedora/get
+    upload.url=https://your.fedora.url/fedora/management/upload
     connection.username=USERNAME
     connection.password=PASSWORD
 
