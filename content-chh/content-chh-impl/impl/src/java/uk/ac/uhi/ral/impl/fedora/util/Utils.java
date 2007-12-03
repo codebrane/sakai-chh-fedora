@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl.util;
+package uk.ac.uhi.ral.impl.fedora.util;
 
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;

@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl.util;
+package uk.ac.uhi.ral.impl.fedora.util;
 
 import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingHandler;

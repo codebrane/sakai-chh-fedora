@@ -11,9 +11,9 @@ import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
-import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
-import uk.ac.uhi.ral.impl.util.TypeMapper;
-import uk.ac.uhi.ral.impl.util.TypeResolver;
+import uk.ac.uhi.ral.impl.fedora.FedoraPrivateItemInfo;
+import uk.ac.uhi.ral.impl.fedora.util.TypeMapper;
+import uk.ac.uhi.ral.impl.fedora.util.TypeResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

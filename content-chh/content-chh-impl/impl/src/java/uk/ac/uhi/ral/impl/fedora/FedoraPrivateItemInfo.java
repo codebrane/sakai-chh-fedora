@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl;
+package uk.ac.uhi.ral.impl.fedora;
 
 public class FedoraPrivateItemInfo {
   private String pid = null;

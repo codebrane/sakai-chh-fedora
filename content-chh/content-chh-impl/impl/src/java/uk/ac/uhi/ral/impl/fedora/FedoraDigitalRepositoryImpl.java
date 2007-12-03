@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl;
+package uk.ac.uhi.ral.impl.fedora;
 
 import fedora.fedoraSystemDef.foxml.*;
 import fedora.webservices.client.api.a.FedoraAPIAServiceStub;
@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
-import uk.ac.uhi.ral.impl.util.Utils;
+import uk.ac.uhi.ral.impl.fedora.util.Utils;
 
 import javax.xml.namespace.QName;
 import java.io.*;

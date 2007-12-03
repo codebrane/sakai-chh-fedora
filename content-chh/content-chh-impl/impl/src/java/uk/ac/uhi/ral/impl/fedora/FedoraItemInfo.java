@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl;
+package uk.ac.uhi.ral.impl.fedora;
 
 import uk.ac.uhi.ral.DigitalItemInfo;
 

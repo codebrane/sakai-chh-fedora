@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl;
+package uk.ac.uhi.ral.impl.fedora;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.params.HttpConnectionParams;

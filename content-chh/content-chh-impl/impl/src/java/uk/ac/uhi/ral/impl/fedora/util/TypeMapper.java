@@ -3,7 +3,7 @@
    $
 */
 
-package uk.ac.uhi.ral.impl.util;
+package uk.ac.uhi.ral.impl.fedora.util;
 
 import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingHandler;
@@ -16,7 +16,7 @@ import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
 import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
-import uk.ac.uhi.ral.impl.FedoraPrivateItemInfo;
+import uk.ac.uhi.ral.impl.fedora.FedoraPrivateItemInfo;
 
 import java.rmi.server.UID;
 
