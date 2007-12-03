@@ -12,13 +12,13 @@
 	  </property>
 
     <property name="repoFactory" >
-      <ref bean="uk.ac.uhi.ral.impl.FedoraDigitalRepositoryFactory"/>
+      <ref bean="uk.ac.uhi.ral.impl.fedora.FedoraDigitalRepositoryFactory"/>
     </property>
 	
   </bean>
 
-  <bean id="uk.ac.uhi.ral.impl.FedoraDigitalRepositoryFactory"
-        class="uk.ac.uhi.ral.impl.FedoraDigitalRepositoryFactory">
+  <bean id="uk.ac.uhi.ral.impl.fedora.FedoraDigitalRepositoryFactory"
+        class="uk.ac.uhi.ral.impl.fedora.FedoraDigitalRepositoryFactory">
     <property name="keystorePath"><value>/Users/alistair/dev/sakai/tomcat/apache-tomcat-5.5.25/components/sakai-content-chh-fedora-pack/WEB-INF/fedora/truststore</value></property>
     <property name="keystorePassword"><value>tomcat</value></property>
     <property name="truststorePath"><value>/Users/alistair/dev/sakai/tomcat/apache-tomcat-5.5.25/components/sakai-content-chh-fedora-pack/WEB-INF/fedora/truststore</value></property>
