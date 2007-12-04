@@ -114,13 +114,10 @@ public class ResourceOrCollection extends RepositoryTest {
            */
           XmlCursor cursor = xml.newCursor();
           cursor.toFirstChild();
-          if (cursor.toChild(new QName("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "Description"))) {
-            if (cursor.toChild(new QName("fedora", "isMemberOf"))) {
-              String collection = cursor.getAttributeText(new QName("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource"));
-              if (collection != null) {
-                collectionName = "Resource is in collection " + collection;
-              }
-            }
+          String namespaceDecl = "declare namespace rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'; declare namespace fed='fedora'; ";
+          cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:isMemberOf/@rdf:resource");
+          while (cursor.toNextSelection()) {
+            collectionName = "Resource is in collection " + cursor.getTextValue();
           }
           cursor.dispose();
         }
