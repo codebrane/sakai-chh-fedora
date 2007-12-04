@@ -11,11 +11,13 @@ import fedora.webservices.client.api.a.FedoraAPIAServiceStub;
 import fedora.webservices.client.api.m.FedoraAPIMServiceStub;
 import info.fedora.definitions.x1.x0.types.*;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.xmlbeans.XmlCursor;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 
@@ -101,6 +103,7 @@ public class ResourceOrCollection extends RepositoryTest {
           MIMETypedStream dsStream = dsdOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
           dsStream.getStream();
           XmlContentType xml = XmlContentType.Factory.parse(new ByteArrayInputStream(dsStream.getStream()));
+
           /*
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
             <rdf:Description rdf:about="info:fedora/demo:78f76bac116a00736c5-7ff0">
@@ -109,16 +112,17 @@ public class ResourceOrCollection extends RepositoryTest {
             </rdf:Description>
           </rdf:RDF>
            */
-          //                                   RDF             Description
-          NodeList nodes = xml.getDomNode().getFirstChild().getFirstChild().getChildNodes();
-          for (int c=0; c < nodes.getLength(); c++) {
-            Node node = nodes.item(c);
-            if (node.getLocalName().equals("isMemberOf")) {
-              Node r = node.getAttributes().getNamedItem("rdf:resource");
-              String[] parts = r.getNodeValue().split("/");
-              collectionName = "Resource is in collection " + parts[parts.length - 1];
+          XmlCursor cursor = xml.newCursor();
+          cursor.toFirstChild();
+          if (cursor.toChild(new QName("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "Description"))) {
+            if (cursor.toChild(new QName("fedora", "isMemberOf"))) {
+              String collection = cursor.getAttributeText(new QName("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource"));
+              if (collection != null) {
+                collectionName = "Resource is in collection " + collection;
+              }
             }
           }
+          cursor.dispose();
         }
       }
 
