@@ -104,7 +104,7 @@ public class ResourceOrCollection extends RepositoryTest {
           /*
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
             <rdf:Description rdf:about="info:fedora/demo:78f76bac116a00736c5-7ff0">
-              <fed:isMemberOfCollection rdf:resource="info:fedora/demo:testcollection" xmlns:fed="fedora"/>
+              <fed:isMemberOf rdf:resource="info:fedora/demo:testcollection" xmlns:fed="fedora"/>
               <myns:owner xmlns:myns="http://www.nsdl.org/ontologies/relationships#">admin</myns:owner>
             </rdf:Description>
           </rdf:RDF>
@@ -113,7 +113,7 @@ public class ResourceOrCollection extends RepositoryTest {
           NodeList nodes = xml.getDomNode().getFirstChild().getFirstChild().getChildNodes();
           for (int c=0; c < nodes.getLength(); c++) {
             Node node = nodes.item(c);
-            if (node.getLocalName().equals("isMemberOfCollection")) {
+            if (node.getLocalName().equals("isMemberOf")) {
               Node r = node.getAttributes().getNamedItem("rdf:resource");
               String[] parts = r.getNodeValue().split("/");
               collectionName = "Resource is in collection " + parts[parts.length - 1];
