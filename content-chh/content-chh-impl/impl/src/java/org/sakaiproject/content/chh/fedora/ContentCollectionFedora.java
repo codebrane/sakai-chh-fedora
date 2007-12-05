@@ -92,10 +92,14 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	* @return a List of the collection's internal members, each a resource id String (may be empty).
 	*/
 	public List getMembers() {
-    // do the fedora ws search here - but from which repo?
     log.info(LOG_MARKER + "getMembers");
 
-    DigitalItemInfo[] items = repo.list();
+    // Root collection for the mount?
+    String pid = null;
+    if (item.getPrivateInfo() != null)
+      pid = ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid();
+
+    DigitalItemInfo[] items = repo.queryFedora(pid, false, null);
 
     List<String> members = new ArrayList<String>(items.length);
     for (DigitalItemInfo item : items) {
@@ -113,6 +117,7 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	public List getMemberResources() {
     log.info(LOG_MARKER + "getMemberResources");
 
+    // @todo yet another ws call
     List members = getMembers();
 
     List<Edit> resources = new ArrayList<Edit>(members.size());

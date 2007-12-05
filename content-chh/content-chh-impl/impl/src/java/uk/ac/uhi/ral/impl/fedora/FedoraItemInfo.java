@@ -24,6 +24,7 @@ public class FedoraItemInfo implements DigitalItemInfo {
   private boolean collection;
   private Object privateInfo;
   private String url = null;
+  private String[] memberships = null;
 
   public void setTitle(String title) {
     this.title = title;
@@ -158,5 +159,12 @@ public class FedoraItemInfo implements DigitalItemInfo {
 
   public String getURL() {
     return url;
+  }
+
+  public void setCollectionMemberships(String[] memberships) {
+    this.memberships = memberships;
+  }
+  public String[] getCollectionMemberships() {
+    return memberships;
   }
 }

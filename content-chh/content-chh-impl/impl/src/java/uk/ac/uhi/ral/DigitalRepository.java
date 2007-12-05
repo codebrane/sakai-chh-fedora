@@ -30,9 +30,9 @@ public interface DigitalRepository {
   public boolean modifyObject(DigitalItemInfo item, String dsID, byte[] dsContent, boolean inline);
   public boolean deleteObject(String pid);
   public void search();
+  public DigitalItemInfo queryFedora(String pid);
+  public DigitalItemInfo[] queryFedora(String pid, boolean collectionsOnly, String collectionName);
   public InputStream getContentAsStream(String endpoint);
   public DigitalItemInfo generateItem();
-  public DigitalItemInfo[] list();
-  public DigitalItemInfo list(String id);
   public boolean commitObject(DigitalItemInfo item);
 }

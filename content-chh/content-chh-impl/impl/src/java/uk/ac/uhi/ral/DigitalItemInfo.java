@@ -41,6 +41,9 @@ public interface DigitalItemInfo {
   public boolean isResource();
   public boolean isCollection();
 
+  public void setCollectionMemberships(String[] memberships);
+  public String[] getCollectionMemberships();
+  
   // //////////////////
   
   public void setDisplayName(String displayName);

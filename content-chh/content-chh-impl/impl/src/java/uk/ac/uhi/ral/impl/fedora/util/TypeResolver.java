@@ -44,15 +44,16 @@ public class TypeResolver {
       item.setModifiedDate("TEST");
     }
     else {
-      item = repo.list(relativePath);
+      item = repo.queryFedora(relativePath);
 
       // New resource being uploaded?
       if (item == null) {
         item = repo.generateItem();
-      }
 
-      item.setIsCollection(false);
-      item.setIsResource(true);
+        // @todo resource or collection?
+        item.setIsCollection(false);
+        item.setIsResource(true);
+      }
     }
 
     return TypeMapper.toContentEntity(item, realParent, relativePath, chh, chhResolver, repo);

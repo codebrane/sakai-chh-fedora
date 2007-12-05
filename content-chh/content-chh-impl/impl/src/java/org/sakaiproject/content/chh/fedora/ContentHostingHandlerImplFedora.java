@@ -9,6 +9,7 @@ import org.sakaiproject.content.api.*;
 import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.tool.cover.SessionManager;
+import uk.ac.uhi.ral.DigitalItemInfo;
 import uk.ac.uhi.ral.DigitalRepository;
 import uk.ac.uhi.ral.DigitalRepositoryFactory;
 import uk.ac.uhi.ral.impl.fedora.FedoraPrivateItemInfo;
@@ -18,10 +19,7 @@ import uk.ac.uhi.ral.impl.fedora.util.TypeResolver;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.PropertyResourceBundle;
+import java.util.*;
 
 /**
  *
@@ -146,21 +144,20 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
     }
 
     ContentCollectionFedora fedoraCollection = (ContentCollectionFedora)cc;
-    List l = fedoraCollection.getMembers();
-    //ArrayList<Edit> collections = new ArrayList<Edit>(l.size());
-    ArrayList<Edit> collections = new ArrayList<Edit>(0);
 
-    /*
-    for (Iterator i = l.listIterator(); i.hasNext();) {
-      String id = (String)i.next();
-
-      ContentEntityFedora ceds = resolveDSpace(ccds.realParent, ccds.endpoint,
-      ccds.basehandle, id.substring(ccds.realParent.getId().length() + 1),
-      this, ccds.searchable);
-      
-      if (ceds instanceof ContentCollectionDSpace) collections.add(ceds.wrap());
+    // Find all collections
+    String pid = fedoraCollection.getId().substring(fedoraCollection.realParent.getId().length() + 1);
+    if (pid.equals(""))
+      pid = null;
+    DigitalItemInfo[] items = fedoraCollection.getRepository().queryFedora(pid, true, null);
+    ContentEntity[] entities = TypeMapper.toContentEntity(items, fedoraCollection.realParent,
+                                                          fedoraCollection.getId().substring(fedoraCollection.realParent.getId().length() + 1),
+                                                          this, contentHostingHandlerResolver,
+                                                          fedoraCollection.getRepository());
+    ArrayList<Edit> collections = new ArrayList<Edit>(entities.length);
+    for (ContentEntity entity : entities) {
+      collections.add(((ContentCollectionFedora)(entity)).wrap());
     }
-    */
 
     return collections;
 	}

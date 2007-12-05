@@ -47,7 +47,9 @@ public class TypeMapper {
 
     int count = 0;
     for (DigitalItemInfo item : items) {
-      entities[count] = toContentEntity(item, realParent, relativePath, chh, chhResolver, repo);
+      entities[count] = toContentEntity(item, realParent,
+                                        ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid(),
+                                        chh, chhResolver, repo);
       count++;
     }
 
@@ -91,6 +93,7 @@ public class TypeMapper {
     if (item.getPublisher() == null) item.setPublisher("PUBLISHER_NOT_SET");
     if (item.getIdentifier() == null) item.setIdentifier("IDENTIFIER_NOT_SET");
 
+    // @todo resource or collection?
     if (item.getPrivateInfo() == null) {
       item.setPrivateInfo(new FedoraPrivateItemInfo());
       item.setIsResource(true);

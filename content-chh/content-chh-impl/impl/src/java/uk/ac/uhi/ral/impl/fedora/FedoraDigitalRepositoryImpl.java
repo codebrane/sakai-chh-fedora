@@ -292,17 +292,6 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     }
   }
 
-  public DigitalItemInfo[] list() {
-    return queryFedora(null);
-  }
-
-  public DigitalItemInfo list(String id) {
-    DigitalItemInfo[] items = queryFedora(id);
-    // If we have an id (pid) at it doesn't exist, then it's a new one being uploaded
-    if (items.length == 0) return null;
-    else return items[0];
-  }
-
   public InputStream getContentAsStream(String endpoint) {
     try {
       EntityConnection connection = new EntityConnection(endpoint,
@@ -327,8 +316,12 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       return null;
     }
   }
+  
+  public DigitalItemInfo queryFedora(String pid) {
+    return queryFedora(pid, false, null)[0];
+  }
 
-  private DigitalItemInfo[] queryFedora(String pid) {
+  public DigitalItemInfo[] queryFedora(String pid, boolean collectionsOnly, String collectionName) {
     // Build a new request document
     FindObjectsDocument doc = FindObjectsDocument.Factory.newInstance();
 
@@ -386,6 +379,12 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       // Loop through all the objects that were found
       for (ObjectFields field : fields) {
         FedoraItemInfo item = new FedoraItemInfo();
+
+        // Assume the object is a non-collection object until we find otherwise
+        item.setIsCollection(false);
+        item.setIsResource(true);
+        boolean objectIsInCollection = false;
+        boolean toBeAdded = false;
 
         if (field.getCreatorArray().length > 0)
           item.setCreator(field.getCreatorArray(0));
@@ -464,16 +463,90 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
           // RELS-EXT core datastream
           if (def.getID().equals("RELS-EXT")) {
             ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setRelsExtDatastreamID(def.getID());
+
+            FedoraAPIMServiceStub mStub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
+            mStub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+            mStub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+            GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
+            GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
+            dsIn.setPid(field.getPid());
+            dsIn.setDsID(def.getID());
+            GetDatastreamResponseDocument dstreamOutDoc = mStub.getDatastream(dsInDoc);
+            Datastream dstream = dstreamOutDoc.getGetDatastreamResponse().getDatastream();
+
+            GetDatastreamDisseminationDocument dsdDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
+            GetDatastreamDisseminationDocument.GetDatastreamDissemination dsd = dsdDoc.addNewGetDatastreamDissemination();
+            dsd.setDsID(dstream.getID());
+            dsd.setPid(field.getPid());
+            GetDatastreamDisseminationResponseDocument dsdOutDoc = stub.getDatastreamDissemination(dsdDoc);
+            MIMETypedStream dsStream = dsdOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
+            if (field.getPid().equals("demo:testcollection")) {
+              System.out.println("HERE");
+            }
+            XmlContentType xml = XmlContentType.Factory.parse(new ByteArrayInputStream(dsStream.getStream()));
+
+            XmlCursor cursor = xml.newCursor();
+            // Move to the root RDF node
+            cursor.toFirstChild();
+
+            // See if the object is in any collections
+            String namespaceDecl = "declare namespace rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'; declare namespace fed='fedora'; ";
+            cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:isMemberOfCollection/@rdf:resource");
+            if (cursor.toNextSelection()) {
+              // PID of the collection object
+              String[] parts = cursor.getTextValue().split("/");
+              if (collectionName != null) {
+                if (parts[parts.length - 1].equals(collectionName)) {
+                  toBeAdded = true;
+                }
+              }
+
+              objectIsInCollection = true;
+            }
+
+            // Reset the cursor ready for the next search
+            cursor.toParent();
+
+            // See if the object is a collection
+            Vector<String> members = new Vector<String>();
+            cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:hasMember/@rdf:resource");
+            while (cursor.toNextSelection()) {
+              // PID of the member object
+              String[] parts = cursor.getTextValue().split("/");
+              members.add(parts[parts.length - 1]);
+            }
+            if (members.size() > 0) {
+              item.setIsCollection(true);
+              item.setIsResource(false);
+              String[] sMembers = new String[members.size()];
+              members.copyInto(sMembers);
+              item.setCollectionMemberships(sMembers);
+            }
+
+            cursor.dispose();
           }
         }
 
-        items.add(item);
+        if (collectionName != null) {
+          if (toBeAdded) {
+            items.add(item);
+          }
+        }
+        else if ((collectionsOnly) && (item.isCollection())) {
+          items.add(item);
+        }
+        else {
+          // We'll hide objects in collections until the collection is opened in Sakai
+          if ((!collectionsOnly) && (!objectIsInCollection)) {
+            items.add(item);
+          }
+        }
       }
 
       DigitalItemInfo[] digitalItems = new DigitalItemInfo[items.size()];
       return (DigitalItemInfo[])items.toArray(digitalItems);
     }
-    catch(RemoteException re) {
+    catch(Exception e) {
       return null;
     }
   }
@@ -576,7 +649,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
   public boolean commitObject(DigitalItemInfo item) {
     // If the object already exists, update it
-    if (list(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid()) != null) {
+    if (queryFedora(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid()) != null) {
       // There's no way to tell if this is a content update, so do it anyway, just in case
       if (item.getBinaryContent() != null) {
         modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getContentDatastreamID(),
