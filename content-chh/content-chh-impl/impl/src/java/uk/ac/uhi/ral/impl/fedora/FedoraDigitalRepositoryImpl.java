@@ -70,7 +70,10 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
   }
 
   public DigitalItemInfo generateItem() {
-    return new FedoraItemInfo();
+    FedoraItemInfo item = new FedoraItemInfo();
+    FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
+    item.setPrivateInfo(privateInfo);
+    return item;
   }
 
   public void init(PropertyResourceBundle repoConfig) {
@@ -228,9 +231,11 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     rdfDescription.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "about", "info:fedora/" + ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
     rdfRoot.appendChild(rdfDescription);
 
+    /*
     Element fedIsMemberOfCollection = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("fedora", "isMemberOfCollection");
     fedIsMemberOfCollection.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "resource", "info:fedora/demo:testcollection");
     rdfDescription.appendChild(fedIsMemberOfCollection);
+    */
 
     Element owner = rdfXmlContent.getDomNode().getOwnerDocument().createElementNS("http://www.nsdl.org/ontologies/relationships#", "owner");
     Text ownerTextNode = rdfXmlContent.getDomNode().getOwnerDocument().createTextNode(item.getCreator());
@@ -317,240 +322,6 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
     }
   }
   
-  public DigitalItemInfo queryFedora(String pid) {
-    return queryFedora(pid, false, null)[0];
-  }
-
-  public DigitalItemInfo[] queryFedora(String pid, boolean collectionsOnly, String collectionName) {
-    // Build a new request document
-    FindObjectsDocument doc = FindObjectsDocument.Factory.newInstance();
-
-    FindObjectsDocument.FindObjects params = doc.addNewFindObjects();
-
-    FieldSearchQuery query = params.addNewQuery();
-    FieldSearchQuery.Conditions conditions = query.addNewConditions();
-    Condition condition = conditions.addNewCondition();
-    condition.setProperty("pid");
-    if (pid == null) {
-      condition.setOperator(ComparisonOperator.HAS);
-      condition.setValue("*");
-    }
-    else {
-      condition.setOperator(ComparisonOperator.EQ);
-      condition.setValue(pid);
-    }
-
-    // http://www.fedora.info/definitions/1/0/types/#complexType_ObjectFields_Link03247988
-    ArrayOfString resultFields = params.addNewResultFields();
-    resultFields.addItem("pid");
-    resultFields.addItem("label");
-    resultFields.addItem("ownerId");
-    resultFields.addItem("title");
-    resultFields.addItem("creator");
-    resultFields.addItem("description");
-    resultFields.addItem("type");
-    resultFields.addItem("mDate");
-    resultFields.addItem("publisher");
-    resultFields.addItem("subject");
-
-    /* XMLBeans sets null as:
-     * <maxResults xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-     * but Fedora doesn't use XMLBeans at the server side and you get a NPE.
-     */
-    //params.setMaxResults(null);
-    params.setMaxResults(new BigInteger("999999999")); // null = no limit on results
-
-    try {
-      // Initiate the client connection to the API-A endpoint
-      FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repoConfig.getString(CONFIG_KEY_API_A_ENDPOINT));
-
-      // Add the auth creds to the client
-      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
-      // Register our custom SSL handler for this connection
-      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
-
-      // Call the web service
-      FindObjectsResponseDocument outDoc = stub.findObjects(doc);
-
-      ObjectFields[] fields = outDoc.getFindObjectsResponse().getResult().getResultList().getObjectFieldsArray();
-
-      Vector<DigitalItemInfo> items = new Vector<DigitalItemInfo>();
-
-      // Loop through all the objects that were found
-      for (ObjectFields field : fields) {
-        FedoraItemInfo item = new FedoraItemInfo();
-
-        // Assume the object is a non-collection object until we find otherwise
-        item.setIsCollection(false);
-        item.setIsResource(true);
-        boolean objectIsInCollection = false;
-        boolean toBeAdded = false;
-
-        if (field.getCreatorArray().length > 0)
-          item.setCreator(field.getCreatorArray(0));
-        else
-          item.setCreator("NOT_SET");
-
-        if (field.getDescriptionArray().length > 0)
-          item.setDescription(field.getDescriptionArray(0));
-        else
-          item.setDescription("NOT_SET");
-
-        if (field.getTitleArray().length > 0)
-          item.setDisplayName(field.getTitleArray(0));
-        else
-          item.setDisplayName("NOT_SET");
-
-        if (field.getPublisherArray().length > 0)
-          item.setPublisher(field.getPublisherArray(0));
-        else
-          item.setPublisher("NOT_SET");
-
-        if (field.getSubjectArray().length > 0)
-          item.setSubject(field.getSubjectArray(0));
-        else
-          item.setSubject("NOT_SET");
-
-        if (field.getTitleArray().length > 0)
-          item.setTitle(field.getTitleArray(0));
-        else
-          item.setTitle("NOT_SET");
-
-        item.setIdentifier(field.getPid());
-        item.setModifiedDate(field.getMDate());
-        item.setOriginalFilename(field.getPid());
-        item.setIsCollection(false);
-        item.setIsResource(true);
-        //item.setType(field.getTypeArray(0));
-
-        FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
-        privateInfo.setPid(field.getPid());
-        privateInfo.setOwnerId(field.getOwnerId());
-        item.setPrivateInfo(privateInfo);
-
-        ListDatastreamsDocument dsDoc = ListDatastreamsDocument.Factory.newInstance();
-        ListDatastreamsDocument.ListDatastreams ds = dsDoc.addNewListDatastreams();
-        ds.setPid(field.getPid());
-        ListDatastreamsResponseDocument dsOutDoc = stub.listDatastreams(dsDoc);
-        DatastreamDef[] defs = dsOutDoc.getListDatastreamsResponse().getDatastreamDefArray();
-
-        int count = 0;
-        for (DatastreamDef def : defs) {
-          GetDatastreamDisseminationDocument dissDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
-          GetDatastreamDisseminationDocument.GetDatastreamDissemination diss = dissDoc.addNewGetDatastreamDissemination();
-          diss.setDsID(def.getID());
-          diss.setPid(field.getPid());
-          GetDatastreamDisseminationResponseDocument dissOutDoc = stub.getDatastreamDissemination(dissDoc);
-          MIMETypedStream stream = dissOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
-          
-          // The first one seems to be the default content, such as PDF etc, with the rest being the DC and RELS-EXT
-          if (count == 0) {
-            item.setMimeType(stream.getMIMEType());
-            item.setBinaryContent(stream.getStream());
-            // https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:002/PDF
-            item.setURL(repoConfig.getString(CONFIG_KEY_DISSEMINATION_ENDPOINT) + "/" +
-                        field.getPid() + "/" + def.getID());
-            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setContentDatastreamID(def.getID());
-
-            count++;
-          }
-
-          // Dublin core datastream
-          if (def.getID().equals("DC")) {
-            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setDCDatastreamID(def.getID());
-          }
-
-          // RELS-EXT core datastream
-          if (def.getID().equals("RELS-EXT")) {
-            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setRelsExtDatastreamID(def.getID());
-
-            FedoraAPIMServiceStub mStub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
-            mStub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
-            mStub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
-            GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
-            GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
-            dsIn.setPid(field.getPid());
-            dsIn.setDsID(def.getID());
-            GetDatastreamResponseDocument dstreamOutDoc = mStub.getDatastream(dsInDoc);
-            Datastream dstream = dstreamOutDoc.getGetDatastreamResponse().getDatastream();
-
-            GetDatastreamDisseminationDocument dsdDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
-            GetDatastreamDisseminationDocument.GetDatastreamDissemination dsd = dsdDoc.addNewGetDatastreamDissemination();
-            dsd.setDsID(dstream.getID());
-            dsd.setPid(field.getPid());
-            GetDatastreamDisseminationResponseDocument dsdOutDoc = stub.getDatastreamDissemination(dsdDoc);
-            MIMETypedStream dsStream = dsdOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
-            if (field.getPid().equals("demo:testcollection")) {
-              System.out.println("HERE");
-            }
-            XmlContentType xml = XmlContentType.Factory.parse(new ByteArrayInputStream(dsStream.getStream()));
-
-            XmlCursor cursor = xml.newCursor();
-            // Move to the root RDF node
-            cursor.toFirstChild();
-
-            // See if the object is in any collections
-            String namespaceDecl = "declare namespace rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'; declare namespace fed='fedora'; ";
-            cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:isMemberOfCollection/@rdf:resource");
-            if (cursor.toNextSelection()) {
-              // PID of the collection object
-              String[] parts = cursor.getTextValue().split("/");
-              if (collectionName != null) {
-                if (parts[parts.length - 1].equals(collectionName)) {
-                  toBeAdded = true;
-                }
-              }
-
-              objectIsInCollection = true;
-            }
-
-            // Reset the cursor ready for the next search
-            cursor.toParent();
-
-            // See if the object is a collection
-            Vector<String> members = new Vector<String>();
-            cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:hasMember/@rdf:resource");
-            while (cursor.toNextSelection()) {
-              // PID of the member object
-              String[] parts = cursor.getTextValue().split("/");
-              members.add(parts[parts.length - 1]);
-            }
-            if (members.size() > 0) {
-              item.setIsCollection(true);
-              item.setIsResource(false);
-              String[] sMembers = new String[members.size()];
-              members.copyInto(sMembers);
-              item.setCollectionMemberships(sMembers);
-            }
-
-            cursor.dispose();
-          }
-        }
-
-        if (collectionName != null) {
-          if (toBeAdded) {
-            items.add(item);
-          }
-        }
-        else if ((collectionsOnly) && (item.isCollection())) {
-          items.add(item);
-        }
-        else {
-          // We'll hide objects in collections until the collection is opened in Sakai
-          if ((!collectionsOnly) && (!objectIsInCollection)) {
-            items.add(item);
-          }
-        }
-      }
-
-      DigitalItemInfo[] digitalItems = new DigitalItemInfo[items.size()];
-      return (DigitalItemInfo[])items.toArray(digitalItems);
-    }
-    catch(Exception e) {
-      return null;
-    }
-  }
-
   public boolean deleteObject(String pid) {
     PurgeObjectDocument doc = PurgeObjectDocument.Factory.newInstance();
     PurgeObjectDocument.PurgeObject purge = doc.addNewPurgeObject();
@@ -649,7 +420,7 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
 
   public boolean commitObject(DigitalItemInfo item) {
     // If the object already exists, update it
-    if (queryFedora(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid()) != null) {
+    if (getResource(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid()) != null) {
       // There's no way to tell if this is a content update, so do it anyway, just in case
       if (item.getBinaryContent() != null) {
         modifyObject(item, ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getContentDatastreamID(),
@@ -718,6 +489,355 @@ public class FedoraDigitalRepositoryImpl implements DigitalRepository {
       */
       connection.disconnect();
       return uploadURL.trim();
+    }
+    catch(Exception e) {
+      log.error(e);
+      return null;
+    }
+  }
+
+
+
+
+
+
+
+  public DigitalItemInfo[] getResources(boolean includeResourcesInCollections) {
+    // Build a new request document
+    FindObjectsDocument doc = FindObjectsDocument.Factory.newInstance();
+
+    FindObjectsDocument.FindObjects params = doc.addNewFindObjects();
+
+    FieldSearchQuery query = params.addNewQuery();
+    FieldSearchQuery.Conditions conditions = query.addNewConditions();
+    Condition condition = conditions.addNewCondition();
+    condition.setProperty("pid");
+    condition.setOperator(ComparisonOperator.HAS);
+    condition.setValue("*");
+
+    // http://www.fedora.info/definitions/1/0/types/#complexType_ObjectFields_Link03247988
+    ArrayOfString resultFields = params.addNewResultFields();
+    resultFields.addItem("pid");
+    resultFields.addItem("label");
+    resultFields.addItem("ownerId");
+    resultFields.addItem("title");
+    resultFields.addItem("creator");
+    resultFields.addItem("description");
+    resultFields.addItem("type");
+    resultFields.addItem("mDate");
+    resultFields.addItem("publisher");
+    resultFields.addItem("subject");
+
+    /* XMLBeans sets null as:
+     * <maxResults xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+     * but Fedora doesn't use XMLBeans at the server side and you get a NPE.
+     */
+    //params.setMaxResults(null);
+    params.setMaxResults(new BigInteger("999999999")); // null = no limit on results
+
+    try {
+      // Initiate the client connection to the API-A endpoint
+      FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repoConfig.getString(CONFIG_KEY_API_A_ENDPOINT));
+
+      // Add the auth creds to the client
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      // Register our custom SSL handler for this connection
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+
+      // Call the web service
+      FindObjectsResponseDocument outDoc = stub.findObjects(doc);
+
+      ObjectFields[] fields = outDoc.getFindObjectsResponse().getResult().getResultList().getObjectFieldsArray();
+
+      Vector<DigitalItemInfo> items = new Vector<DigitalItemInfo>();
+
+      // Loop through all the objects that were found
+      for (ObjectFields field : fields) {
+        FedoraItemInfo item = new FedoraItemInfo();
+
+        // Assume the object is a non-collection object until we find otherwise
+        item.setIsCollection(false);
+        item.setIsResource(true);
+
+        if (field.getCreatorArray().length > 0)
+          item.setCreator(field.getCreatorArray(0));
+        else
+          item.setCreator("NOT_SET");
+
+        if (field.getDescriptionArray().length > 0)
+          item.setDescription(field.getDescriptionArray(0));
+        else
+          item.setDescription("NOT_SET");
+
+        if (field.getTitleArray().length > 0)
+          item.setDisplayName(field.getTitleArray(0));
+        else
+          item.setDisplayName("NOT_SET");
+
+        if (field.getPublisherArray().length > 0)
+          item.setPublisher(field.getPublisherArray(0));
+        else
+          item.setPublisher("NOT_SET");
+
+        if (field.getSubjectArray().length > 0)
+          item.setSubject(field.getSubjectArray(0));
+        else
+          item.setSubject("NOT_SET");
+
+        if (field.getTitleArray().length > 0)
+          item.setTitle(field.getTitleArray(0));
+        else
+          item.setTitle("NOT_SET");
+
+        item.setIdentifier(field.getPid());
+        item.setModifiedDate(field.getMDate());
+        item.setOriginalFilename(field.getPid());
+        item.setIsCollection(false);
+        item.setIsResource(true);
+        //item.setType(field.getTypeArray(0));
+
+        FedoraPrivateItemInfo privateInfo = new FedoraPrivateItemInfo();
+        privateInfo.setPid(field.getPid());
+        privateInfo.setOwnerId(field.getOwnerId());
+        item.setPrivateInfo(privateInfo);
+
+        ListDatastreamsDocument dsDoc = ListDatastreamsDocument.Factory.newInstance();
+        ListDatastreamsDocument.ListDatastreams ds = dsDoc.addNewListDatastreams();
+        ds.setPid(field.getPid());
+        ListDatastreamsResponseDocument dsOutDoc = stub.listDatastreams(dsDoc);
+        DatastreamDef[] defs = dsOutDoc.getListDatastreamsResponse().getDatastreamDefArray();
+
+        int count = 0;
+        for (DatastreamDef def : defs) {
+          GetDatastreamDisseminationDocument dissDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
+          GetDatastreamDisseminationDocument.GetDatastreamDissemination diss = dissDoc.addNewGetDatastreamDissemination();
+          diss.setDsID(def.getID());
+          diss.setPid(field.getPid());
+          GetDatastreamDisseminationResponseDocument dissOutDoc = stub.getDatastreamDissemination(dissDoc);
+          MIMETypedStream stream = dissOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
+
+          // The first one seems to be the default content, such as PDF etc, with the rest being the DC and RELS-EXT
+          if (count == 0) {
+            item.setMimeType(stream.getMIMEType());
+            item.setBinaryContent(stream.getStream());
+            // https://sgarbh.smo.uhi.ac.uk:8101/fedora/get/demo:002/PDF
+            item.setURL(repoConfig.getString(CONFIG_KEY_DISSEMINATION_ENDPOINT) + "/" +
+                        field.getPid() + "/" + def.getID());
+            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setContentDatastreamID(def.getID());
+
+            count++;
+          }
+
+          // Dublin core datastream
+          if (def.getID().equals("DC")) {
+            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setDCDatastreamID(def.getID());
+          }
+
+          // RELS-EXT core datastream
+          if (def.getID().equals("RELS-EXT")) {
+            ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setRelsExtDatastreamID(def.getID());
+          }
+        }
+
+        if (isCollection(item)) {
+          item.setIsCollection(true);
+          item.setIsResource(false);
+          items.add(item);
+        }
+
+        if ((item.isResource()) && (!isInCollection(item))) {
+          items.add(item);
+        }
+
+        if ((item.isResource()) && (isInCollection(item)) && (includeResourcesInCollections)) {
+          items.add(item);
+        }
+      }
+
+      DigitalItemInfo[] digitalItems = new DigitalItemInfo[items.size()];
+      return (DigitalItemInfo[])items.toArray(digitalItems);
+    }
+    catch(Exception e) {
+      log.error(e);
+      return null;
+    }
+  }
+
+  public DigitalItemInfo getResource(String pid) {
+    DigitalItemInfo[] items = getResources(INCLUDE_RESOURCES_IN_COLLECTIONS);
+    for (DigitalItemInfo item : items) {
+      if (((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid().equals(pid)) {
+        return item;
+      }
+    }
+
+    return null;
+  }
+
+  public DigitalItemInfo[] getCollections(String exludeThisCollection) {
+    Vector<DigitalItemInfo> collections = new Vector<DigitalItemInfo>();
+
+    DigitalItemInfo[] items = getResources(DO_NOT_INCLUDE_RESOURCES_IN_COLLECTIONS);
+    for (DigitalItemInfo item : items) {
+      if ((exludeThisCollection == null) ||
+          (!(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid().equals(exludeThisCollection)))) {
+        if (isCollection(item)) {
+          collections.add(item);
+        }
+      }
+    }
+
+    DigitalItemInfo[] digitalItems = new DigitalItemInfo[collections.size()];
+    return (DigitalItemInfo[])collections.toArray(digitalItems);
+  }
+
+  public DigitalItemInfo[] getMembersInCollection(String collectionPid) {
+    return getMembersOfCollection(getResource(collectionPid));
+  }
+
+  private boolean isCollection(DigitalItemInfo item) {
+    boolean isCollection = false;
+
+    try {
+      FedoraAPIMServiceStub mStub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
+      mStub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      mStub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+      GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
+      GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
+      dsIn.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      dsIn.setDsID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getRelsExtDatastreamID());
+      GetDatastreamResponseDocument dstreamOutDoc = mStub.getDatastream(dsInDoc);
+      Datastream dstream = dstreamOutDoc.getGetDatastreamResponse().getDatastream();
+      
+      FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repoConfig.getString(CONFIG_KEY_API_A_ENDPOINT));
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+      GetDatastreamDisseminationDocument dsdDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
+      GetDatastreamDisseminationDocument.GetDatastreamDissemination dsd = dsdDoc.addNewGetDatastreamDissemination();
+      dsd.setDsID(dstream.getID());
+      dsd.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      GetDatastreamDisseminationResponseDocument dsdOutDoc = stub.getDatastreamDissemination(dsdDoc);
+      MIMETypedStream dsStream = dsdOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
+      XmlContentType xml = XmlContentType.Factory.parse(new ByteArrayInputStream(dsStream.getStream()));
+
+      XmlCursor cursor = xml.newCursor();
+      // Move to the root RDF node
+      cursor.toFirstChild();
+
+      // See if the object is a collection
+      String namespaceDecl = "declare namespace rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'; declare namespace fed='fedora'; ";
+      cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:hasMember/@rdf:resource");
+      if (cursor.toNextSelection()) {
+        isCollection = true;
+      }
+
+      cursor.dispose();
+
+      return isCollection;
+    }
+    catch(Exception e) {
+      log.error(e);
+      return false;
+    }
+  }
+
+  private boolean isInCollection(DigitalItemInfo item) {
+    boolean inCollection = false;
+
+    try {
+      FedoraAPIMServiceStub mStub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
+      mStub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      mStub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+      GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
+      GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
+      dsIn.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      dsIn.setDsID(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getRelsExtDatastreamID());
+      GetDatastreamResponseDocument dstreamOutDoc = mStub.getDatastream(dsInDoc);
+      Datastream dstream = dstreamOutDoc.getGetDatastreamResponse().getDatastream();
+
+      FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repoConfig.getString(CONFIG_KEY_API_A_ENDPOINT));
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+      GetDatastreamDisseminationDocument dsdDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
+      GetDatastreamDisseminationDocument.GetDatastreamDissemination dsd = dsdDoc.addNewGetDatastreamDissemination();
+      dsd.setDsID(dstream.getID());
+      dsd.setPid(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+      GetDatastreamDisseminationResponseDocument dsdOutDoc = stub.getDatastreamDissemination(dsdDoc);
+      MIMETypedStream dsStream = dsdOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
+      XmlContentType xml = XmlContentType.Factory.parse(new ByteArrayInputStream(dsStream.getStream()));
+
+      XmlCursor cursor = xml.newCursor();
+      // Move to the root RDF node
+      cursor.toFirstChild();
+
+      // See if the object is in any collections
+      String namespaceDecl = "declare namespace rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'; declare namespace fed='fedora'; ";
+      cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:isMemberOfCollection/@rdf:resource");
+      if (cursor.toNextSelection()) {
+        inCollection = true;
+      }
+
+      cursor.dispose();
+
+      return inCollection;
+    }
+    catch(Exception e) {
+      log.error(e);
+      return false;
+    }
+  }
+
+  private DigitalItemInfo[] getMembersOfCollection(DigitalItemInfo collectionItem) {
+    try {
+      FedoraAPIMServiceStub mStub = new FedoraAPIMServiceStub(repoConfig.getString(CONFIG_KEY_API_M_ENDPOINT));
+      mStub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      mStub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+      GetDatastreamDocument dsInDoc = GetDatastreamDocument.Factory.newInstance();
+      GetDatastreamDocument.GetDatastream dsIn = dsInDoc.addNewGetDatastream();
+      dsIn.setPid(((FedoraPrivateItemInfo)(collectionItem.getPrivateInfo())).getPid());
+      dsIn.setDsID(((FedoraPrivateItemInfo)(collectionItem.getPrivateInfo())).getRelsExtDatastreamID());
+      GetDatastreamResponseDocument dstreamOutDoc = mStub.getDatastream(dsInDoc);
+      Datastream dstream = dstreamOutDoc.getGetDatastreamResponse().getDatastream();
+
+      FedoraAPIAServiceStub stub = new FedoraAPIAServiceStub(repoConfig.getString(CONFIG_KEY_API_A_ENDPOINT));
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.AUTHENTICATE, authenticator);
+      stub._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, customProtocolHandler);
+      GetDatastreamDisseminationDocument dsdDoc = GetDatastreamDisseminationDocument.Factory.newInstance();
+      GetDatastreamDisseminationDocument.GetDatastreamDissemination dsd = dsdDoc.addNewGetDatastreamDissemination();
+      dsd.setDsID(dstream.getID());
+      dsd.setPid(((FedoraPrivateItemInfo)(collectionItem.getPrivateInfo())).getPid());
+      GetDatastreamDisseminationResponseDocument dsdOutDoc = stub.getDatastreamDissemination(dsdDoc);
+      MIMETypedStream dsStream = dsdOutDoc.getGetDatastreamDisseminationResponse().getDissemination();
+      XmlContentType xml = XmlContentType.Factory.parse(new ByteArrayInputStream(dsStream.getStream()));
+
+      XmlCursor cursor = xml.newCursor();
+      // Move to the root RDF node
+      cursor.toFirstChild();
+
+      // See if the object is a collection
+      Vector<String> memberPIDs = new Vector<String>();
+      String namespaceDecl = "declare namespace rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'; declare namespace fed='fedora'; ";
+      cursor.selectPath(namespaceDecl + "$this//rdf:Description/fed:hasMember/@rdf:resource");
+      while (cursor.toNextSelection()) {
+        String[] parts = cursor.getTextValue().split("/");
+        memberPIDs.add(parts[parts.length - 1]);
+      }
+
+      Vector<DigitalItemInfo> members = new Vector<DigitalItemInfo>();
+      for (int c=0; c < memberPIDs.size(); c++) {
+        members.add(getResource(memberPIDs.get(c)));
+        /*
+        String[] sMembers = new String[memberPIDs.size()];
+        memberPIDs.copyInto(sMembers);
+        item.setCollectionMemberships(sMembers);
+        members.add(item);
+        */
+      }
+      
+      cursor.dispose();
+
+      DigitalItemInfo[] digitalItems = new DigitalItemInfo[members.size()];
+      return (DigitalItemInfo[])members.toArray(digitalItems);
     }
     catch(Exception e) {
       log.error(e);

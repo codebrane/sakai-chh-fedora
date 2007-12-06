@@ -44,7 +44,7 @@ public class TypeResolver {
       item.setModifiedDate("TEST");
     }
     else {
-      item = repo.queryFedora(relativePath);
+      item = repo.getResource(relativePath);
 
       // New resource being uploaded?
       if (item == null) {

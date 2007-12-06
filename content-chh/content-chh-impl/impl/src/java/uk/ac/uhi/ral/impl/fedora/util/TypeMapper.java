@@ -94,13 +94,12 @@ public class TypeMapper {
     if (item.getIdentifier() == null) item.setIdentifier("IDENTIFIER_NOT_SET");
 
     // @todo resource or collection?
-    if (item.getPrivateInfo() == null) {
-      item.setPrivateInfo(new FedoraPrivateItemInfo());
-      item.setIsResource(true);
-      item.setIsCollection(false);
+    item.setIsResource(true);
+    item.setIsCollection(false);
+    if (((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid() == null)
       ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setPid("demo:" + new UID().toString().replaceAll(":", ""));
+    if (((FedoraPrivateItemInfo)(item.getPrivateInfo())).getOwnerId() == null)
       ((FedoraPrivateItemInfo)(item.getPrivateInfo())).setOwnerId(SessionManager.getCurrentSession().getUserEid());
-    }
 
     return item;
   }

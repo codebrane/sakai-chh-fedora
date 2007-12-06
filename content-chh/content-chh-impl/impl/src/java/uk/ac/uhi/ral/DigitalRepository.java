@@ -24,15 +24,26 @@ public interface DigitalRepository {
   /** The password for the connection */
   public static final String CONFIG_KEY_CONNECTION_PASSWORD = "connection.password";
 
+  public static final boolean INCLUDE_RESOURCES_IN_COLLECTIONS = true;
+  public static final boolean DO_NOT_INCLUDE_RESOURCES_IN_COLLECTIONS = false;
+
   public PropertyResourceBundle getRepoConfig();
   public void init(PropertyResourceBundle config);
+
   public boolean createObject(DigitalItemInfo item);
   public boolean modifyObject(DigitalItemInfo item, String dsID, byte[] dsContent, boolean inline);
   public boolean deleteObject(String pid);
-  public void search();
-  public DigitalItemInfo queryFedora(String pid);
-  public DigitalItemInfo[] queryFedora(String pid, boolean collectionsOnly, String collectionName);
+  public boolean commitObject(DigitalItemInfo item);
+
+//  public void search();
+//  public DigitalItemInfo queryFedora(String pid);
+//  public DigitalItemInfo[] queryFedora(String pid, boolean collectionsOnly, String collectionName);
+
   public InputStream getContentAsStream(String endpoint);
   public DigitalItemInfo generateItem();
-  public boolean commitObject(DigitalItemInfo item);
+
+  public DigitalItemInfo getResource(String pid);
+  public DigitalItemInfo[] getResources(boolean includeResourcesInCollections);
+  public DigitalItemInfo[] getCollections(String exludeThisCollection);
+  public DigitalItemInfo[] getMembersInCollection(String collectionPid);
 }

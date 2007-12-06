@@ -94,12 +94,14 @@ public class ContentCollectionFedora extends ContentEntityFedora implements Cont
 	public List getMembers() {
     log.info(LOG_MARKER + "getMembers");
 
-    // Root collection for the mount?
-    String pid = null;
-    if (item.getPrivateInfo() != null)
-      pid = ((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid();
-
-    DigitalItemInfo[] items = repo.queryFedora(pid, false, null);
+    DigitalItemInfo[] items = null;
+    if (((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid() == null) {
+      // Get all resources for the root collection (mountpoint)
+      items = repo.getResources(DigitalRepository.DO_NOT_INCLUDE_RESOURCES_IN_COLLECTIONS);
+    }
+    else {
+      items = repo.getMembersInCollection(((FedoraPrivateItemInfo)(item.getPrivateInfo())).getPid());
+    }
 
     List<String> members = new ArrayList<String>(items.length);
     for (DigitalItemInfo item : items) {

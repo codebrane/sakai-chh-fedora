@@ -146,10 +146,7 @@ public class ContentHostingHandlerImplFedora implements ContentHostingHandler {
     ContentCollectionFedora fedoraCollection = (ContentCollectionFedora)cc;
 
     // Find all collections
-    String pid = fedoraCollection.getId().substring(fedoraCollection.realParent.getId().length() + 1);
-    if (pid.equals(""))
-      pid = null;
-    DigitalItemInfo[] items = fedoraCollection.getRepository().queryFedora(pid, true, null);
+    DigitalItemInfo[] items = fedoraCollection.getRepository().getCollections(((FedoraPrivateItemInfo)(fedoraCollection.getItem().getPrivateInfo())).getPid());
     ContentEntity[] entities = TypeMapper.toContentEntity(items, fedoraCollection.realParent,
                                                           fedoraCollection.getId().substring(fedoraCollection.realParent.getId().length() + 1),
                                                           this, contentHostingHandlerResolver,
