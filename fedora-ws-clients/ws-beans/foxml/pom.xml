@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fedora-foxml</artifactId>
   <groupId>fedora</groupId>
-  <version>1.0</version>
+  <version>1.1</version>
   
   <reporting>
     <plugins>
@@ -37,7 +37,7 @@
     		</executions>
     		<inherited>true</inherited>
     		<configuration>
-       		<schemaDirectory>${basedir}/xsd</schemaDirectory>
+       		<schemaDirectory>${basedir}/xsd/1.1</schemaDirectory>
        		<download>true</download>
        		<noUpa>true</noUpa>
     		</configuration>
