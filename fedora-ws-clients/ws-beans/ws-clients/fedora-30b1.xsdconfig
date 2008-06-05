@@ -1,0 +1,7 @@
+<xb:config xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config"
+           xmlns:rt="uk:ac:ox:oucs:ask:repo:ws:types">
+  <!-- Namespace to package mapping for ask-repo-types.xsd -->
+  <xb:namespace uri="uk:ac:ox:oucs:ask:repo:ws:types">
+    <xb:package>uk.ac.ox.oucs.ask.service.repository.ws.types</xb:package>
+  </xb:namespace>
+</xb:config>
