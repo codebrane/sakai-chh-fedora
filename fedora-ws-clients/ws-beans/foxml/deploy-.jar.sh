@@ -1,8 +1,8 @@
 mvn deploy:deploy-file \
-    -Dfile=/Users/alistair/.m2/repository/fedora/fedora-foxml/1.0/fedora-foxml-1.0.jar \
+    -Dfile=target/fedora-foxml-1.1.jar \
     -DgroupId=fedora \
     -DartifactId=fedora-foxml \
-    -Dversion=1.0 \
+    -Dversion=1.1 \
     -Dpackaging=jar \
     -DgeneratePom=true \
     -DrepositoryId=source.uhi.ac.uk-repository \
