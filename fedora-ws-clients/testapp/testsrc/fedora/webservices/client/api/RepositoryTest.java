@@ -32,7 +32,7 @@ import fedora.webservices.client.api.a.test.FedoraProtocolSocketFactory;
  */
 public abstract class RepositoryTest {
   /** The format and version of ingest messages */
-  protected static final String DIGITAL_OBJECT_FORMAT_FOXML = "foxml1.0";
+  protected static final String DIGITAL_OBJECT_FORMAT_FOXML = "info:fedora/fedora-system:FOXML-1.1";
   
   /** Definitions for keys in repository.properties */
   protected static final String PROPS_KEY_TRUSTSTORE_LOCATION = "truststore.location";
