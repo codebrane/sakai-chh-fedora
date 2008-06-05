@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   
-  <name>sakai-content-chh-fedora-ws-clients</name>
+  <name>sakai-content-chh-fedora-ws-clients-tests</name>
   <groupId>org.sakaiproject</groupId>
-  <artifactId>sakai-content-chh-fedora-ws-clients</artifactId>
-  <version>M2</version>
+  <artifactId>sakai-content-chh-fedora-ws-clients-tests</artifactId>
+  <version>1.0</version>
   
   <organization>
     <name>UHI Millennium Institute</name>
@@ -23,19 +23,19 @@
     <dependency>
       <groupId>fedora</groupId>
       <artifactId>fedora-api-a-client</artifactId>
-      <version>2.2.1</version>
+      <version>3.0-b1</version>
     </dependency>
     
     <dependency>
       <groupId>fedora</groupId>
       <artifactId>fedora-api-m-client</artifactId>
-      <version>2.2.1</version>
+      <version>3.0-b1</version>
     </dependency>
     
     <dependency>
       <groupId>fedora</groupId>
       <artifactId>fedora-foxml</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
     </dependency>
     <!-- **************************************************** -->
     
