@@ -44,6 +44,7 @@ public class Ingest extends RepositoryTest {
     DigitalObjectDocument.DigitalObject object = objectDoc.addNewDigitalObject();
 
     object.setPID(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_PID));
+    object.setVERSION(DigitalObjectDocument.DigitalObject.VERSION.X_1_1);
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////
     // Fedora object properties
@@ -64,10 +65,11 @@ public class Ingest extends RepositoryTest {
     labelProperty.setNAME(PropertyType.NAME.INFO_FEDORA_FEDORA_SYSTEM_DEF_MODEL_LABEL);
     labelProperty.setVALUE(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_LABEL));
 
+    //@todo not needed in Fedora 3.0 beta 1?
     // <foxml:property NAME="info:fedora/fedora-system:def/model#contentModel" VALUE="TEST_IMAGE"/>
-    PropertyType contentModelProperty = objectProperties.addNewProperty();
-    contentModelProperty.setNAME(PropertyType.NAME.INFO_FEDORA_FEDORA_SYSTEM_DEF_MODEL_CONTENT_MODEL);
-    contentModelProperty.setVALUE(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_CONTENT_MODEL));
+    //PropertyType contentModelProperty = objectProperties.addNewProperty();
+    //contentModelProperty.setNAME(PropertyType.NAME.INFO_FEDORA_FEDORA_SYSTEM_DEF_MODEL_CONTENT_MODEL);
+    //contentModelProperty.setVALUE(repositoryProperties.getString(PROPS_KEY_TEST_INGEST_FILE_CONTENT_MODEL));
 
     // <foxml:extproperty NAME="http://www.openarchives.org/OAI/1.1/oai-identifier.xsd" VALUE="oai:cornell.edu:demo:999"/>
     // For use with <foxml:datastreamVersion ID="DC.0" MIMETYPE="text/xml" LABEL="Default Dublin Core Record">
@@ -183,7 +185,7 @@ public class Ingest extends RepositoryTest {
     XmlCursor cursor = objectDoc.newCursor();
     if (cursor.toFirstChild())
       cursor.setAttributeText(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"),
-                                        "info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-0.xsd");
+                                        "info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd");
 
     ingest.setObjectXML(Utils.xmlToString(objectDoc).getBytes());
 
